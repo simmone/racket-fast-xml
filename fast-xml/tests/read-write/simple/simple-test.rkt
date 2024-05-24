@@ -14,7 +14,10 @@
    (test-case
     "test-simple1-xml"
 
-    (let ([xml_hash (xml-file-to-hash simple1_xml_file '(("value" . v)))])
+    (let ([xml_hash
+           (xml-file-to-hash
+            simple1_xml_file
+            '(("value" . v)))])
       (check-equal? (hash-count xml_hash) 1)
 
       (check-equal? (hash-ref xml_hash "value") 1)

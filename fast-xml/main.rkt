@@ -1,32 +1,25 @@
 #lang racket
 
 (provide (contract-out
-          [xml-file-to-hash (-> path-string? list? hash?)]
-          [xml-port-to-hash (-> input-port? list? hash?)]
+          [xml-file-to-hash (-> path-string? pair? hash?)]
+          [xml-port-to-hash (-> input-port? pair? hash?)]
           [lists-to-xml (-> list? string?)]
           ))
 
-(define (def->hash def)
-  (let ([def_hash (make-hash)])
-    (let loop-def ([loop_defs def])
-      (when (not (null? loop_defs))
-        (hash-set! def_hash (caar loop_defs) (cdar loop_defs))
-        (loop-def (cdr loop_defs))))
-    def_hash))
-
-(define (xml-file-to-hash xml_file def)
+(define (xml-file-to-hash xml_file def_pairs)
   (with-input-from-file xml_file
     (lambda ()
       (xml-port-to-hash (current-input-port) def))))
 
 ; 'START: scan start
-; 'WAITING_KEY: waiting to encounter '<'
+; 'WAITING_KEY_START: waiting to encounter '<'
 ; 'READING_KEY: next chars will be read as key
+; 'KEY_END: next chars will be read as key
 
-(define (xml-port-to-hash xml_port def)
-  (let ([xml_hash (make-hash)]
-        [def_hash (def->hash def)])
+(define (xml-port-to-hash xml_port def_pairs)
+  (let ([xml_hash (make-hash)])
     (let loop ([ch (read-char xml_port)]
+               [defs def_pairs]
                [status 'START]
                [value ''])
       (when (not (eof-object? ch))
