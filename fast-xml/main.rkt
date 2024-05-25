@@ -6,18 +6,12 @@
           [lists-to-xml (-> list? string?)]
           ))
 
-(struct TRAVERSE
+(struct XML
         (
-         ( #:mutable)
-         (mode #:mutable)
-         (error_level #:mutable)
-         (version #:mutable)
-         (modules #:mutable)
-         (point_val_map #:mutable)
-         (point_type_map #:mutable)
-         (matrix #:mutable)
-         (one_color #:mutable)
-         (zero_color #:mutable)
+         (status #:mutable)
+         (defs #:mutable)
+         (keys #:mutable)
+         (chars #:mutable)
          )
         #:transparent
         )
@@ -26,6 +20,20 @@
   (with-input-from-file xml_file
     (lambda ()
       (xml-port-to-hash (current-input-port) def_pairs))))
+
+(define (xml-port-to-hash xml_port def_pairs)
+  (let ([xml_hash (make-hash)]
+        [xml (XML 'START def_pairs '() '())])
+    (let loop ([ch (read-char xml_port)])
+      (when (not (eof-object? ch))
+        (cond
+         [(eq? (XML-status xml) 'START)
+          (set-XML-status! xml 'KEY_START)]
+         [(eq? (XML-status xml) 'KEY_START)
+          (if (char=? ch #\<)
+              (loop (read-char) defs  'READING_OR_KEY_END' keys values)
+              (loop (read-char) defs status keys values))]
+
 
 ; loop parameters:
 ; ch: read a char each loop.
