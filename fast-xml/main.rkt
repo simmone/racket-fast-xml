@@ -6,6 +6,22 @@
           [lists-to-xml (-> list? string?)]
           ))
 
+(struct TRAVERSE
+        (
+         ( #:mutable)
+         (mode #:mutable)
+         (error_level #:mutable)
+         (version #:mutable)
+         (modules #:mutable)
+         (point_val_map #:mutable)
+         (point_type_map #:mutable)
+         (matrix #:mutable)
+         (one_color #:mutable)
+         (zero_color #:mutable)
+         )
+        #:transparent
+        )
+
 (define (xml-file-to-hash xml_file def_pairs)
   (with-input-from-file xml_file
     (lambda ()
