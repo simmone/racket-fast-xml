@@ -1,7 +1,7 @@
 #lang racket
 
 (reqauire "xml.rkt"
-          "key-reading.rkt"
+          "key-end.rkt"
           )
 
 (provide (contract-out
@@ -19,11 +19,13 @@
 ; 'KEY_START: waiting to encounter '<'
 ; 'KEY_READING: next chars will be read as key;
 ; 'KEY_END: next chars will be read as key;
-; 'VALUE: reading value
+; 'KEY_VALUE_START: reading key value
 
 (define (xml-port-to-hash xml_port def_pairs)
   (let ([xml (XML 'START def_pairs '() '() (make-hash))])
-    (let loop ([ch (read-char xml_port)])
+    (let loop ([ch (read-char xml_port)]
+               [keys '()]
+               [chars '()])
       (when (not (eof-object? ch))
         (cond
          [(eq? (XML-status xml) 'START)
@@ -35,9 +37,27 @@
          [(eq? status 'KEY_READING)
           (when (char=? ch #\>)
             (set-XML-status! xml 'KEY_END)
-            (key-reading ch xml))]
+            (let ([key (list->string (reverse chars))])
+              (if (string=? key (car defs))
+                  (loop (read-char xml_port) (cons key keys) '())
+                  (loop (read-char xml_port) keys '()))))]
+         [(and
+           (eq? status 'KEY_END)
+           (char? ch #\<))
+          (set-XML-status! xml 'KEY_START)]
          )
-        (loop (read-char))))
+        
+        (cond
+         [(eq? (XML-status xml) 'KEY_READING)
+          (loop (read-char xml_port) keys (cons ch chars))]
+         [(eq? (XML-status xml) 'KEY_VALUE_START)
+          (loop (
+          
+         
+        (if (or (eq? status 'KEY_START)
+                (eq? status 'KEY_VALUE_START))
+            (loop (read-char) (cons ch chars))
+            (loop (read-char) '()))
     (XML-xml_hash xml)))
 
 (define (xml-port-to-hash xml_port def_pairs)

@@ -8,9 +8,10 @@
                             'KEY_START
                             'KEY-READING
                             'KEY_END
+                            'KEY_VALUE
                             ))
                    (defs pair?)
-                   (chars (listof char?))
+                   (keys (listof string?)
                    (data_hash hash?)
                    )
                   ]
@@ -21,7 +22,6 @@
          (status #:mutable)
          (defs #:mutable)
          (keys #:mutable)
-         (chars #:mutable)
          (data_hash #:mutable)
          )
         #:transparent
