@@ -21,6 +21,12 @@
     (lambda ()
       (xml-port-to-hash (current-input-port) def_pairs))))
 
+; 'START: scan start
+; 'KEY_START: waiting to encounter '<'
+; 'KEY_READING: next chars will be read as key;
+; 'KEY_END: next chars will be read as key;
+; 'VALUE: reading value
+
 (define (xml-port-to-hash xml_port def_pairs)
   (let ([xml_hash (make-hash)]
         [xml (XML 'START def_pairs '() '())])
@@ -29,23 +35,13 @@
         (cond
          [(eq? (XML-status xml) 'START)
           (set-XML-status! xml 'KEY_START)]
-         [(eq? (XML-status xml) 'KEY_START)
-          (if (char=? ch #\<)
-              (loop (read-char) defs  'READING_OR_KEY_END' keys values)
-              (loop (read-char) defs status keys values))]
-
-
-; loop parameters:
-; ch: read a char each loop.
-; defs: searching defines, '(key1 (key2 (key3 . 'v)))
-; status: current search status.
-; keys: combine find keys to a list: '(key1 key2 key3...)
-; value: combine char to a list.
-
-; 'START: scan start
-; 'KEY_START: waiting to encounter '<'
-; 'READING_OR_KEY_END: next chars will be read as key, or waiting to encounter '>'
-; 'VALUE: reading value
+         [(and
+           (eq? (XML-status xml) 'KEY_START)
+           (char=? ch #\<))
+          (set-XML-status! xml 'KEY_READING)]
+         )
+        (loop (read-char))))
+    xml_hash))
 
 (define (xml-port-to-hash xml_port def_pairs)
   (let ([xml_hash (make-hash)])
