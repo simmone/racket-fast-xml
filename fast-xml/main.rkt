@@ -1,20 +1,14 @@
 #lang racket
 
+(reqauire "xml.rkt"
+          "key-reading.rkt"
+          )
+
 (provide (contract-out
           [xml-file-to-hash (-> path-string? pair? hash?)]
           [xml-port-to-hash (-> input-port? pair? hash?)]
           [lists-to-xml (-> list? string?)]
           ))
-
-(struct XML
-        (
-         (status #:mutable)
-         (defs #:mutable)
-         (keys #:mutable)
-         (chars #:mutable)
-         )
-        #:transparent
-        )
 
 (define (xml-file-to-hash xml_file def_pairs)
   (with-input-from-file xml_file
@@ -28,8 +22,7 @@
 ; 'VALUE: reading value
 
 (define (xml-port-to-hash xml_port def_pairs)
-  (let ([xml_hash (make-hash)]
-        [xml (XML 'START def_pairs '() '())])
+  (let ([xml (XML 'START def_pairs '() '() (make-hash))])
     (let loop ([ch (read-char xml_port)])
       (when (not (eof-object? ch))
         (cond
@@ -39,9 +32,13 @@
            (eq? (XML-status xml) 'KEY_START)
            (char=? ch #\<))
           (set-XML-status! xml 'KEY_READING)]
+         [(eq? status 'KEY_READING)
+          (when (char=? ch #\>)
+            (set-XML-status! xml 'KEY_END)
+            (key-reading ch xml))]
          )
         (loop (read-char))))
-    xml_hash))
+    (XML-xml_hash xml)))
 
 (define (xml-port-to-hash xml_port def_pairs)
   (let ([xml_hash (make-hash)])
