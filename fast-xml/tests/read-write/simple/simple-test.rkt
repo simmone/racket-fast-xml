@@ -17,16 +17,18 @@
     (let ([xml_hash
            (xml-file-to-hash
             simple1_xml_file
-            '(("value" . v)))])
+            '("basic1" . ("value" . v)))])
       (check-equal? (hash-count xml_hash) 1)
-
-      (check-equal? (hash-ref xml_hash "value") 1)
+      
+      (printf "xml_hash: ~a\n" xml_hash)
+      
+      (check-equal? (hash-ref xml_hash "basic1.value") "1")
       ))
 
    (test-case
     "write-simple1-xml"
 
-    (let ([xml '(("value" "1"))])
+    (let ([xml '("basic1" ("value" "1"))])
       (call-with-input-file simple1_xml_file
         (lambda (p)
           (check-equal? (lists-to-xml xml)
