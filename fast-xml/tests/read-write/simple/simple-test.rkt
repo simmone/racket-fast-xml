@@ -6,6 +6,7 @@
          "../../../main.rkt")
 
 (define-runtime-path simple1_xml_file "simple1.xml")
+(define-runtime-path simple2_xml_file "simple2.xml")
 
 (define test-simple
   (test-suite
@@ -17,12 +18,10 @@
     (let ([xml_hash
            (xml-file-to-hash
             simple1_xml_file
-            '("basic1" . ("value" . v)))])
+            '("basic1.value"))])
       (check-equal? (hash-count xml_hash) 1)
       
-      (printf "xml_hash: ~a\n" xml_hash)
-      
-      (check-equal? (hash-ref xml_hash "basic1.value") "1")
+      (check-equal? (hash-ref xml_hash "basic1.value") '("1"))
       ))
 
    (test-case
@@ -34,6 +33,17 @@
           (check-equal? (lists-to-xml xml)
                         (port->string p))))))
 
+   (test-case
+    "test-simple2-xml"
+
+    (let ([xml_hash
+           (xml-file-to-hash
+            simple2_xml_file
+            '(("h1.h2.topic")))])
+      (check-equal? (hash-count xml_hash) 1)
+      
+      (check-equal? (hash-ref xml_hash "h1.h2.topic") '("cx"))
+      ))
   ))
 
 (run-tests test-simple)
