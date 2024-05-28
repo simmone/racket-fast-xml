@@ -6,6 +6,8 @@
           [lists-to-xml (-> list? string?)]
           ))
 
+(require "lib.rkt")
+
 (define (xml-file-to-hash xml_file def_pairs)
   (with-input-from-file xml_file
     (lambda ()
@@ -15,11 +17,11 @@
 ; 'KEY_READING: next chars will be read as key;
 ; 'KEY_VALUE_READING: reading key value
 
-(define (xml-port-to-hash xml_port def_pairs)
+(define (xml-port-to-hash xml_port def_strs)
   (let ([xml_hash (make-hash)])
     (let loop ([status 'KEY_START]
                [ch (read-char xml_port)]
-               [defs def_pairs]
+               [defs (car (defs-to-list def_strs))]
                [keys '()]
                [chars '()])
       (printf "~a,~a,~a,~a,~a\n" status ch defs keys chars)
@@ -32,14 +34,12 @@
          [(eq? status 'KEY_READING)
           (if (char=? ch #\>)
             (let ([key (list->string (reverse chars))])
-              (if (string=? key (car defs))
+              (if (string=? key (if (string? defs) defs (car defs)))
                   (cond
-                   [(pair? (cdr defs))
+                   [(string? defs)
+                    (loop 'KEY_VALUE_READING (read-char xml_port) defs (cons key keys) '())]
+                   [else
                     (loop 'KEY_START (read-char xml_port) (cdr defs) (cons key keys) '())]
-                   [(symbol? (cdr defs))
-                    (if (eq? (cdr defs) 'v)
-                        (loop 'KEY_VALUE_READING (read-char xml_port) def_pairs (cons key keys) '())
-                        (loop 'KEY_VALUE_READING (read-char xml_port) def_pairs (cons key keys) '()))]
                    )
                   (loop 'KEY_START (read-char xml_port) defs keys '())))
             (loop status (read-char xml_port) defs keys (cons ch chars)))]

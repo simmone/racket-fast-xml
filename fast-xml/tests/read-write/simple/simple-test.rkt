@@ -39,7 +39,7 @@
     (let ([xml_hash
            (xml-file-to-hash
             simple2_xml_file
-            '(("h1.h2.topic")))])
+            '("h1.h2.topic"))])
       (check-equal? (hash-count xml_hash) 1)
       
       (check-equal? (hash-ref xml_hash "h1.h2.topic") '("cx"))
