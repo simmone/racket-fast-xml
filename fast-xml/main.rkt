@@ -14,8 +14,10 @@
       (xml-port-to-hash (current-input-port) def_pairs))))
 
 ; 'KEY_START: waiting to encounter '<'
-; 'KEY_READING: next chars will be read as key;
+; 'KEY_READING: next chars will be read as key
 ; 'KEY_VALUE_READING: reading key value
+; 'ATTR_KEY_WAITING: skip spaces to read attr name
+; 'ATTR_KEY_READING: start read attr name till encounter '='
 
 (define (xml-port-to-hash xml_port def_strs)
   (let ([xml_hash (make-hash)])
@@ -32,17 +34,22 @@
               (loop 'KEY_READING (read-char xml_port) defs keys chars)
               (loop status (read-char xml_port) defs keys chars))]
          [(eq? status 'KEY_READING)
-          (if (char=? ch #\>)
+          (cond
+           [(or
+             (char=? ch #\space)
+             (char=? ch #\>))
             (let ([key (list->string (reverse chars))])
               (if (string=? key (if (string? defs) defs (car defs)))
                   (cond
                    [(string? defs)
                     (loop 'KEY_VALUE_READING (read-char xml_port) defs (cons key keys) '())]
                    [else
-                    (loop 'KEY_START (read-char xml_port) (cdr defs) (cons key keys) '())]
-                   )
-                  (loop 'KEY_START (read-char xml_port) defs keys '())))
-            (loop status (read-char xml_port) defs keys (cons ch chars)))]
+                    (if (char=? ch #\space)
+                        (loop 'ATTR_KEY_WAITING (read-char xml_port) (cdr defs) (cons key keys) '())
+                        (loop 'KEY_START (read-char xml_port) (cdr defs) (cons key keys) '()))])
+                  (loop 'KEY_START (read-char xml_port) defs keys '())))]
+           [else
+            (loop status (read-char xml_port) defs keys (cons ch chars))])]
          [(eq? status 'KEY_VALUE_READING)
           (if (char=? ch #\<)
               (let ([key (string-join (reverse keys) ".")])
@@ -51,6 +58,30 @@
                            `(,@(hash-ref xml_hash key '()) ,(list->string (reverse chars))))
                 (loop 'KEY_START (read-char xml_port) defs keys '()))
               (loop status (read-char xml_port) defs keys (cons ch chars)))]
+         [(eq? status 'ATTR_KEY_WAITING)
+          (cond
+           [(char=? ch #\space)
+            (loop status (read-char xml_port) defs keys chars)]
+           [(char=? ch #\>)
+              (loop 'KEY_START (read-char xml_port) defs keys '())
+              (loop 'ATTR_KEY_READING (read-char xml_port) defs keys (cons ch chars))])]
+         [(eq? status 'ATTR_KEY_READING)
+          (if (char=? ch #\=)
+            (let ([key (list->string (reverse chars))])
+              (if (string=? key (if (string? defs) defs (car defs)))
+                  (cond
+                   [(string? defs)
+                    (loop 'ATTR_VALUE_READING (read-char xml_port) defs (cons key keys) '())]
+                   [else
+                    (if (char=? ch #\space)
+                        (loop 'ATTR_KEY_WAITING (read-char xml_port) (cdr defs) (cons key keys) '())
+                        (loop 'KEY_START (read-char xml_port) (cdr defs) (cons key keys) '()))])
+
+              (loop 'ATTR_KEY_WAITING (read-char xml_port) (cdr defs) (cons key keys) '())
+              (loop 'KEY_START (read-char xml_port) (cdr defs) (cons key keys) '()))])
+
+          (if (char=? ch #\=)
+              (loop 'ATTR_VALUE_READING (read-char xml_port) 
          )))
     xml_hash))
 
