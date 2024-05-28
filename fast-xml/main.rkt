@@ -45,8 +45,10 @@
             (loop status (read-char xml_port) defs keys (cons ch chars)))]
          [(eq? status 'KEY_VALUE_READING)
           (if (char=? ch #\<)
-              (begin
-                (hash-set! xml_hash (string-join (reverse keys) ".") (list->string (reverse chars)))
+              (let ([key (string-join (reverse keys) ".")])
+                (hash-set! xml_hash
+                           key
+                           `(,@(hash-ref xml_hash key '()) ,(list->string (reverse chars))))
                 (loop 'KEY_START (read-char xml_port) defs keys '()))
               (loop status (read-char xml_port) defs keys (cons ch chars)))]
          )))
