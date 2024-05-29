@@ -18,6 +18,7 @@
 ; 'KEY_VALUE_READING: reading key value
 ; 'ATTR_KEY_WAITING: skip spaces to read attr name
 ; 'ATTR_KEY_READING: start read attr name till encounter '='
+; 'ATTR_VALUE_READING: reading attr value
 
 (define (xml-port-to-hash xml_port def_strs)
   (let ([xml_hash (make-hash)])
@@ -27,7 +28,7 @@
                [keys '()]
                [chars '()])
       (printf "~a,~a,~a,~a,~a\n" status ch defs keys chars)
-      (when (not (eof-object? ch))
+      (when (not (eof-object? ch)) 
         (cond
          [(eq? status 'KEY_START)
           (if (char=? ch #\<)
@@ -63,7 +64,7 @@
            [(char=? ch #\space)
             (loop status (read-char xml_port) defs keys chars)]
            [(char=? ch #\>)
-              (loop 'KEY_START (read-char xml_port) defs keys '())
+              (loop 'KEY_VALUE_READING (read-char xml_port) defs keys '())
               (loop 'ATTR_KEY_READING (read-char xml_port) defs keys (cons ch chars))])]
          [(eq? status 'ATTR_KEY_READING)
           (if (char=? ch #\=)
@@ -73,15 +74,17 @@
                    [(string? defs)
                     (loop 'ATTR_VALUE_READING (read-char xml_port) defs (cons key keys) '())]
                    [else
-                    (if (char=? ch #\space)
-                        (loop 'ATTR_KEY_WAITING (read-char xml_port) (cdr defs) (cons key keys) '())
-                        (loop 'KEY_START (read-char xml_port) (cdr defs) (cons key keys) '()))])
-
-              (loop 'ATTR_KEY_WAITING (read-char xml_port) (cdr defs) (cons key keys) '())
-              (loop 'KEY_START (read-char xml_port) (cdr defs) (cons key keys) '()))])
-
-          (if (char=? ch #\=)
-              (loop 'ATTR_VALUE_READING (read-char xml_port) 
+                    (loop 'KEY_START (read-char xml_port) defs keys '())])
+                  (loop 'KEY_START (read-char xml_port) defs keys '())))
+            (loop 'ATTR_KEY_READING (read-char xml_port) (cdr defs) keys (cons ch chars)))]
+         [(eq? status 'ATTR_VALUE_READING)
+          (if (char=? ch #\space)
+              (let ([key (string-join (reverse keys) ".")])
+                (hash-set! xml_hash
+                           key
+                           `(,@(hash-ref xml_hash key '()) ,(list->string (reverse chars))))
+                (loop 'KEY_START (read-char xml_port) defs keys '()))
+              (loop status (read-char xml_port) defs keys (cons ch chars)))]
          )))
     xml_hash))
 
