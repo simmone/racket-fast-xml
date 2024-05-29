@@ -11,44 +11,44 @@
    (test-case
     "test-defs-to-hash"
 
-    (let ([defs '("topic.v")])
-      (check-equal? (defs-to-hash defs)
-                    '#hash(
-                           ("topic" . k)
-                           ("topic.v" . v)
-                           ))
+    (let ([def_hash (defs-to-hash '("topic.v"))])
+      (check-equal? (hash-count def_hash) 2)
 
-    (let ([defs '("h1.h2.h3.topic")])
-      (check-equal? (defs-to-hash defs)
-                    '#hash(
-                           ("h1" . k)
-                           ("h1.h2" . k)
-                           ("h1.h2.h3" . k)
-                           ("h1.h2.h3.topic" . v))))
+      (check-eq? (hash-ref def_hash "topic") 'k)
+      (check-eq? (hash-ref def_hash "topic.v") 'v)
+      )
 
-    (let ([defs '("h1.h2.h3.topic" "h3.h4.h5.v")])
-      (check-equal? (defs-to-hash defs)
-                    '#hash(
-                           ("h1" . k)
-                           ("h1.h2" . k)
-                           ("h1.h2.h3" . k)
-                           ("h1.h2.h3.topic" . v)
-                           ("h3" . k)
-                           ("h3.h4" . k)
-                           ("h3.h4.h5" . k)
-                           ("h3.h4.h5.v" . v))))
+    (let ([def_hash (defs-to-hash '("h1.h2.h3.topic"))])
+      (check-equal? (hash-count def_hash) 4)
 
-    (let ([defs '("h1.h2.h3.topic" "h1.h2.h4.topic")])
-      (check-equal? (defs-to-hash defs)
-                    '#hash(
-                           ("h1" . k)
-                           ("h1.h2" . k)
-                           ("h1.h2.h3" . k)
-                           ("h1.h2.h4" . k)
-                           ("h1.h2.h3.topic" . v)
-                           ("h1.h2.h4.topic" . v))))
+      (check-eq? (hash-ref def_hash "h1") 'k)
+      (check-eq? (hash-ref def_hash "h1.h2") 'k)
+      (check-eq? (hash-ref def_hash "h1.h2.h3") 'k)
+      (check-eq? (hash-ref def_hash "h1.h2.h3.topic") 'v))
 
-      ))
+    (let ([def_hash (defs-to-hash '("h1.h2.h3.topic" "h3.h4.h5.v"))])
+      (check-equal? (hash-count def_hash) 8)
+
+      (check-eq? (hash-ref def_hash "h1") 'k)
+      (check-eq? (hash-ref def_hash "h1.h2") 'k)
+      (check-eq? (hash-ref def_hash "h1.h2.h3") 'k)
+      (check-eq? (hash-ref def_hash "h1.h2.h3.topic") 'v)
+
+      (check-eq? (hash-ref def_hash "h3") 'k)
+      (check-eq? (hash-ref def_hash "h3.h4") 'k)
+      (check-eq? (hash-ref def_hash "h3.h4.h5") 'k)
+      (check-eq? (hash-ref def_hash "h3.h4.h5.v") 'v))
+
+    (let ([def_hash (defs-to-hash '("h1.h2.h3.topic" "h1.h2.h4.topic"))])
+      (check-equal? (hash-count def_hash) 6)
+
+      (check-eq? (hash-ref def_hash "h1") 'k)
+      (check-eq? (hash-ref def_hash "h1.h2") 'k)
+      (check-eq? (hash-ref def_hash "h1.h2.h3") 'k)
+      (check-eq? (hash-ref def_hash "h1.h2.h4") 'k)
+      (check-eq? (hash-ref def_hash "h1.h2.h3.topic") 'v)
+      (check-eq? (hash-ref def_hash "h1.h2.h4.topic") 'v))
+    )
   ))
 
 (run-tests test-lib)

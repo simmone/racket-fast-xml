@@ -1,23 +1,21 @@
 #lang racket
 
 (provide (contract-out
-          [defs-to-list (-> (listof string?) list?)]
+          [defs-to-hash (-> (listof string?) hash?)]
           ))
 
-(define (defs-to-list def_list)
-  (let loop-def ([defs def_list]
-                 [result_list '()])
-    (if (not (null? defs))
-        (loop-def
-         (cdr defs)
-         (cons
-          (let ([def_items (reverse (regexp-split #rx"\\." (car defs)))])
-            (let loop-items ([items (cdr def_items)]
-                             [result_pair (car def_items)])
-              (if (not (null? items))
-                  (loop-items (cdr items) (cons (car items) result_pair))
-                  result_pair)))
-          result_list))
-        (reverse result_list))))
-          
-
+(define (defs-to-hash def_list)
+  (let ([def_hash (make-hash)])
+    (let loop-def ([defs def_list])
+      (when (not (null? defs))
+        (let ([def_items (regexp-split #rx"\\." (car defs))])
+          (let loop-items ([items def_items]
+                           [last_keys '()])
+            (when (not (null? items))
+              (let ([keys (cons (car items) last_keys)])
+                (if (= (length items) 1)
+                    (hash-set! def_hash (string-join (reverse keys) ".") 'v)
+                    (hash-set! def_hash (string-join (reverse keys) ".") 'k))
+                (loop-items (cdr items) keys)))))
+        (loop-def (cdr defs))))
+    def_hash))        
