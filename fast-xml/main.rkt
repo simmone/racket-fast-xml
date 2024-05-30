@@ -1,24 +1,18 @@
 #lang racket
 
 (provide (contract-out
-          [xml-file-to-hash (-> path-string? (listof stgring?) hash?)]
+          [xml-file-to-hash (-> path-string? (listof string?) hash?)]
           [xml-port-to-hash (-> input-port? (listof string?) hash?)]
           [lists-to-xml (-> list? string?)]
           ))
 
-(require "lib.rkt")
+(require "lib.rkt"
+         "key-start.rkt")
 
 (define (xml-file-to-hash xml_file def_list)
   (with-input-from-file xml_file
     (lambda ()
       (xml-port-to-hash (current-input-port) def_list))))
-
-; 'KEY_START: waiting to encounter '<'
-; 'KEY_READING: next chars will be read as key
-; 'KEY_VALUE_READING: reading key value
-; 'ATTR_KEY_WAITING: skip spaces to read attr name
-; 'ATTR_KEY_READING: start read attr name till encounter '='
-; 'ATTR_VALUE_READING: reading attr value
 
 (define (xml-port-to-hash xml_port def_list)
   (let ([xml_hash (make-hash)]
@@ -27,65 +21,17 @@
                [ch (read-char xml_port)]
                [keys '()]
                [chars '()])
-      (printf "~a,~a,~a,~a,~a\n" status ch defs keys chars)
-      (when (not (eof-object? ch)) 
-        (cond
-         [(eq? status 'KEY_START)
-          (if (char=? ch #\<)
-              (loop 'KEY_READING (read-char xml_port) defs keys chars)
-              (loop status (read-char xml_port) defs keys chars))]
-         [(eq? status 'KEY_READING)
-          (cond
-           [(or
-             (char=? ch #\space)
-             (char=? ch #\>))
-            (let ([key (list->string (reverse chars))])
-              (if (string=? key (if (string? defs) defs (car defs)))
-                  (cond
-                   [(string? defs)
-                    (loop 'KEY_VALUE_READING (read-char xml_port) defs (cons key keys) '())]
-                   [else
-                    (if (char=? ch #\space)
-                        (loop 'ATTR_KEY_WAITING (read-char xml_port) (cdr defs) (cons key keys) '())
-                        (loop 'KEY_START (read-char xml_port) (cdr defs) (cons key keys) '()))])
-                  (loop 'KEY_START (read-char xml_port) defs keys '())))]
-           [else
-            (loop status (read-char xml_port) defs keys (cons ch chars))])]
-         [(eq? status 'KEY_VALUE_READING)
-          (if (char=? ch #\<)
-              (let ([key (string-join (reverse keys) ".")])
-                (hash-set! xml_hash
-                           key
-                           `(,@(hash-ref xml_hash key '()) ,(list->string (reverse chars))))
-                (loop 'KEY_START (read-char xml_port) defs keys '()))
-              (loop status (read-char xml_port) defs keys (cons ch chars)))]
-         [(eq? status 'ATTR_KEY_WAITING)
-          (cond
-           [(char=? ch #\space)
-            (loop status (read-char xml_port) defs keys chars)]
-           [(char=? ch #\>)
-              (loop 'KEY_VALUE_READING (read-char xml_port) defs keys '())
-              (loop 'ATTR_KEY_READING (read-char xml_port) defs keys (cons ch chars))])]
-         [(eq? status 'ATTR_KEY_READING)
-          (if (char=? ch #\=)
-            (let ([key (list->string (reverse chars))])
-              (if (string=? key (if (string? defs) defs (car defs)))
-                  (cond
-                   [(string? defs)
-                    (loop 'ATTR_VALUE_READING (read-char xml_port) defs (cons key keys) '())]
-                   [else
-                    (loop 'KEY_START (read-char xml_port) defs keys '())])
-                  (loop 'KEY_START (read-char xml_port) defs keys '())))
-            (loop 'ATTR_KEY_READING (read-char xml_port) (cdr defs) keys (cons ch chars)))]
-         [(eq? status 'ATTR_VALUE_READING)
-          (if (char=? ch #\space)
-              (let ([key (string-join (reverse keys) ".")])
-                (hash-set! xml_hash
-                           key
-                           `(,@(hash-ref xml_hash key '()) ,(list->string (reverse chars))))
-                (loop 'KEY_START (read-char xml_port) defs keys '()))
-              (loop status (read-char xml_port) defs keys (cons ch chars)))]
-         )))
+
+      (printf "~a,~a,~a,~a\n" status ch keys chars)
+
+      (when (not (eof-object? ch))
+        (loop
+         (cond
+          [(eq? status 'KEY_START) (key-start ch)]
+         )
+         ch
+         keys
+         chars)))
     xml_hash))
 
 (define (lists-to-xml xml_list)

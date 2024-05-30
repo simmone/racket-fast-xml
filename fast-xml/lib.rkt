@@ -2,7 +2,13 @@
 
 (provide (contract-out
           [defs-to-hash (-> (listof string?) hash?)]
+          [STATUS? (-> symbol? boolean?)]
           ))
+
+(define (STATUS? status)
+  (if (not (memq status '(KEY_START)))
+      #f
+      #t))
 
 (define (defs-to-hash def_list)
   (let ([def_hash (make-hash)])
