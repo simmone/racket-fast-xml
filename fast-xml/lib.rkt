@@ -10,6 +10,10 @@
                  '(
                    KEY_START
                    KEY_READING
+                   ATTR_KEY_WAITING
+                   ATTR_KEY_READING
+                   ATTR_VALUE_READING
+                   KEY_END
                    )))
       #f
       #t))
