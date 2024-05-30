@@ -6,7 +6,11 @@
           ))
 
 (define (STATUS? status)
-  (if (not (memq status '(KEY_START)))
+  (if (not (memq status
+                 '(
+                   KEY_START
+                   KEY_READING
+                   )))
       #f
       #t))
 

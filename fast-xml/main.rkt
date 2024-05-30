@@ -7,7 +7,9 @@
           ))
 
 (require "lib.rkt"
-         "key-start.rkt")
+         "key-start.rkt"
+         "key-reading.rkt"
+         )
 
 (define (xml-file-to-hash xml_file def_list)
   (with-input-from-file xml_file
@@ -28,10 +30,17 @@
         (loop
          (cond
           [(eq? status 'KEY_START) (key-start ch)]
+          [(eq? status 'KEY_READING) (key-reading ch)]
          )
-         ch
+         (read-char xml_port)
          keys
-         chars)))
+         (if
+          (or
+           (eq? status 'KEY_READING)
+           )
+          (cons ch chars)
+          '())
+         )))
     xml_hash))
 
 (define (lists-to-xml xml_list)

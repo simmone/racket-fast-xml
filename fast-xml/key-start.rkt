@@ -7,4 +7,6 @@
           ))
 
 (define (key-start ch)
-  'KEY_START)
+  (if (char=? ch #\<)
+      'KEY_READING
+      'KEY_START))
