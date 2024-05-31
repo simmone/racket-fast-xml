@@ -8,7 +8,7 @@
 
 (define (attr-value-reading ch)
   (cond
-   [(char=? ch #\space)
+   [(char=? ch #\")
       'ATTR_KEY_WAITING]
    [(char=? ch #\/)
     'KEY_END]

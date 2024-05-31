@@ -7,6 +7,13 @@
           ))
 
 (define (attr-key-waiting ch)
-  (if (char=? ch #\space)
-      'ATTR_KEY_WAITING
-      'ATTR_KEY_READING))
+  (cond
+   [(char=? ch #\space)
+    'ATTR_KEY_WAITING]
+   [(char=? ch #\>)
+    'KEY_END]
+   [(char=? ch #\?)
+    'ATTR_KEY_WAITING]
+   [else
+    'ATTR_KEY_READING]
+   ))

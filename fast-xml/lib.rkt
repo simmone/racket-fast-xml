@@ -12,6 +12,7 @@
                    KEY_READING
                    ATTR_KEY_WAITING
                    ATTR_KEY_READING
+                   ATTR_VALUE_WAITING
                    ATTR_VALUE_READING
                    KEY_END
                    )))

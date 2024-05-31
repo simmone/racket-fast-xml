@@ -9,10 +9,11 @@
 (require "lib.rkt"
          "status/key-start.rkt"
          "status/key-reading.rkt"
+         "status/key-end.rkt"
          "status/attr-key-waiting.rkt"
          "status/attr-key-reading.rkt"
+         "status/attr-value-waiting.rkt"
          "status/attr-value-reading.rkt"
-         "status/key-end.rkt"
          )
 
 (define (xml-file-to-hash xml_file def_list)
@@ -35,10 +36,11 @@
          (cond
           [(eq? status 'KEY_START) (key-start ch)]
           [(eq? status 'KEY_READING) (key-reading ch)]
+          [(eq? status 'KEY_END) (key-end ch)]
           [(eq? status 'ATTR_KEY_WAITING) (attr-key-waiting ch)]
           [(eq? status 'ATTR_KEY_READING) (attr-key-reading ch)]
+          [(eq? status 'ATTR_VALUE_WAITING) (attr-value-waiting ch)]
           [(eq? status 'ATTR_VALUE_READING) (attr-value-reading ch)]
-          [(eq? status 'KEY_END) (KEY_END ch)]
          )
          (read-char xml_port)
          keys

@@ -8,5 +8,5 @@
 
 (define (attr-key-reading ch)
   (if (char=? ch #\=)
-      'ATTR_VALUE_READING
+      'ATTR_VALUE_WAITING
       'ATTR_KEY_READING))
