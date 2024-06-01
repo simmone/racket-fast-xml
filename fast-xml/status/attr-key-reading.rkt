@@ -3,10 +3,10 @@
 (require "../lib.rkt")
 
 (provide (contract-out
-          [attr-key-reading (-> char? STATUS?)]
+          [attr-key-reading (-> char? (values STATUS? boolean?))]
           ))
 
 (define (attr-key-reading ch)
-  (if (char=? ch #\=)
-      'ATTR_VALUE_WAITING
-      'ATTR_KEY_READING))
+   (if (char=? ch #\=)
+       (values 'ATTR_VALUE_WAITING #f)
+       (values 'ATTR_KEY_READING #t)))

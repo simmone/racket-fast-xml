@@ -10,6 +10,7 @@
          "status/key-start.rkt"
          "status/key-reading.rkt"
          "status/key-end.rkt"
+         "status/key-value-reading.rkt"
          "status/attr-key-waiting.rkt"
          "status/attr-key-reading.rkt"
          "status/attr-value-waiting.rkt"
@@ -22,6 +23,7 @@
       (xml-port-to-hash (current-input-port) def_list))))
 
 (define (xml-port-to-hash xml_port def_list)
+  (printf "start\n")
   (let ([xml_hash (make-hash)]
         [def_hash (defs-to-hash def_list)])
     (let loop ([status 'KEY_START]
@@ -32,25 +34,24 @@
       (printf "~a,~a,~a,~a\n" status ch keys chars)
 
       (when (not (eof-object? ch))
-        (loop
-         (cond
+
+        (define-values
+            (next_status reserve_key? reserve_char?)
+          (cond
           [(eq? status 'KEY_START) (key-start ch)]
           [(eq? status 'KEY_READING) (key-reading ch)]
+          [(eq? status 'KEY_VALUE_READING) (key-value-reading ch)]
           [(eq? status 'KEY_END) (key-end ch)]
           [(eq? status 'ATTR_KEY_WAITING) (attr-key-waiting ch)]
           [(eq? status 'ATTR_KEY_READING) (attr-key-reading ch)]
           [(eq? status 'ATTR_VALUE_WAITING) (attr-value-waiting ch)]
-          [(eq? status 'ATTR_VALUE_READING) (attr-value-reading ch)]
-         )
+          [(eq? status 'ATTR_VALUE_READING) (attr-value-reading ch)]))
+
+        (loop
+         next_status
          (read-char xml_port)
-         keys
-         (if
-          (or
-           (eq? status 'KEY_READING)
-           )
-          (cons ch chars)
-          '())
-         )))
+         (if reserve_key? (cons (list->string (reverse chars)) keys) '())
+         (if reserve_char? (cons ch chars) '()))))
     xml_hash))
 
 (define (lists-to-xml xml_list)
@@ -58,7 +59,6 @@
 
 (define (lists-to-compact_xml xml_list)
   (add-xml-head (regexp-replace* #rx">\n *<" (lists-to-xml_content xml_list) "><")))
-
 
 (define (add-xml-head xml_str)
   (format "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n\n~a" xml_str))

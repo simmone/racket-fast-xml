@@ -15,6 +15,7 @@
                    ATTR_VALUE_WAITING
                    ATTR_VALUE_READING
                    KEY_END
+                   KEY_VALUE_READING
                    )))
       #f
       #t))

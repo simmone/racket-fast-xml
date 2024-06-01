@@ -3,15 +3,15 @@
 (require "../lib.rkt")
 
 (provide (contract-out
-          [key-reading (-> char? STATUS?)]
+          [key-reading (-> char? (values STATUS? boolean? boolean?))]
           ))
 
 (define (key-reading ch)
   (cond
    [(char=? ch #\space)
-    'ATTR_KEY_WAITING]
+    (values 'ATTR_KEY_WAITING #f #t)]
    [(char=? ch #\>)
-    'KEY_START]
+    (values 'KEY_END #f #t)]
    [else
-    'KEY_READING]
+    (values 'KEY_READING #t #f)]
    ))

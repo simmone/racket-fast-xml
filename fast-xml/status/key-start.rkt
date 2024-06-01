@@ -3,10 +3,12 @@
 (require "../lib.rkt")
 
 (provide (contract-out
-          [key-start (-> char? STATUS?)]
+          [key-start (-> char? (values STATUS? #f))]
           ))
 
 (define (key-start ch)
-  (if (char=? ch #\<)
-      'KEY_READING
-      'KEY_START))
+  (values
+   (if (char=? ch #\<)
+       'KEY_READING
+       'KEY_START)
+   #f))

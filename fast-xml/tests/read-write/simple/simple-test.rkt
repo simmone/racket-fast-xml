@@ -18,8 +18,19 @@
     (let ([xml_hash
            (xml-file-to-hash
             simple1_xml_file
-            '("basic1.value"))])
-      (check-equal? (hash-count xml_hash) 1)
+            '(
+              "?xml.version"
+              "?xml.encoding"
+              "?xml.standalone"
+              "basic1.value"
+              ))])
+      (check-equal? (hash-count xml_hash) 4)
+
+      (check-equal? (hash-ref xml_hash "?xml.version") '("1.0"))
+
+      (check-equal? (hash-ref xml_hash "?xml.encoding") '("UTF-8"))
+
+      (check-equal? (hash-ref xml_hash "?xml.standalone") '("yes"))
       
       (check-equal? (hash-ref xml_hash "basic1.value") '("1"))
       ))
