@@ -29,9 +29,10 @@
     (let loop ([status 'KEY_START]
                [ch (read-char xml_port)]
                [keys '()]
-               [chars '()])
+               [chars '()]
+               [waiting_key #f])
 
-      (printf "~a,~a,~a,~a\n" status ch keys chars)
+      (printf "~a,~a,~a,~a,~a\n" status ch keys chars waiting_key)
 
       (when (not (eof-object? ch))
 
@@ -45,14 +46,30 @@
           [(eq? status 'ATTR_KEY_WAITING) (attr-key-waiting ch)]
           [(eq? status 'ATTR_KEY_READING) (attr-key-reading ch)]
           [(eq? status 'ATTR_VALUE_WAITING) (attr-value-waiting ch)]
-          [(eq? status 'ATTR_VALUE_READING) (attr-value-reading ch)]))
+          [(eq? status 'ATTR_VALUE_READING) (attr-value-reading ch)]
+          [(eq? status 'ATTR_KEY_END)
+           (let ([key (format "~a.~a"
+                              (string-join (reverse keys) ".")
+                              (list->string (reverse (cdr chars))))])
+             (printf "key:~a\n" key)
+             (if (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
+                 (begin
+                   (set! waiting_key key)
+                   (values 'ATTR_VALUE_READING #t #f))
+                 (values 'ATTR_KEY_WAITING #f #f)))]
+          [(eq? status 'ATTR_VALUE_END)
+           (when waiting_key
+             (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(list->string (reverse chars))))
+             (set! waiting_key  #f))
+           (values 'ATTR_KEY_WAITING #f #f)]))
 
         (loop
          next_status
          (read-char xml_port)
-         (if reserve_key? (cons (list->string (reverse chars)) keys) '())
-         (if reserve_char? (cons ch chars) '()))))
-    xml_hash))
+         (if reserve_key? (cons (list->string (reverse chars)) keys) keys)
+         (if reserve_char? (cons ch chars) '())
+         waiting_key))
+    xml_hash)))
 
 (define (lists-to-xml xml_list)
   (add-xml-head (lists-to-xml_content xml_list)))

@@ -9,9 +9,9 @@
 (define (key-reading ch)
   (cond
    [(char=? ch #\space)
-    (values 'ATTR_KEY_WAITING #f #t)]
+    (values 'ATTR_KEY_WAITING #t #f)]
    [(char=? ch #\>)
     (values 'KEY_END #f #t)]
    [else
-    (values 'KEY_READING #t #f)]
+    (values 'KEY_READING #f #t)]
    ))
