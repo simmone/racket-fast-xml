@@ -9,7 +9,9 @@
 (define (attr-value-end ch)
   (values
    (cond
-    [(or (char=? ch #\?) (char=? ch #\>))
+    [(char=? ch #\?)
+     'KEY_PAIR_END]
+    [(char=? ch #\>)
      'KEY_END]
     [else
      'ATTR_KEY_WAITING])

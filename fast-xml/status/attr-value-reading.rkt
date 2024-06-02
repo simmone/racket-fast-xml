@@ -11,6 +11,6 @@
    [(char=? ch #\")
     (values 'ATTR_VALUE_END #t #t #f)]
    [(char=? ch #\/)
-    (values 'KEY_END #t  #t #f)]
+    (values 'KEY_PAIR_END #t  #t #f)]
    [else
     (values 'ATTR_VALUE_READING #t #f #t)]))

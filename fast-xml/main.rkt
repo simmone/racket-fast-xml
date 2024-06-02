@@ -32,7 +32,7 @@
                [chars '()]
                [waiting_key #f])
 
-      (printf "~a,~a,~a,~a,~a\n" status ch keys chars waiting_key)
+;      (printf "~a,~a,[~a],~a,~a\n" status ch keys chars waiting_key)
 
       (when (not (eof-object? ch))
         (define-values
@@ -46,12 +46,12 @@
           [(eq? status 'ATTR_KEY_READING) (attr-key-reading ch)]
           [(eq? status 'ATTR_VALUE_WAITING) (attr-value-waiting ch)]
           [(eq? status 'ATTR_VALUE_READING) (attr-value-reading ch)]
-          [(eq? status 'KEY_END)
+          [(eq? status 'KEY_END) (key-end ch)]
+          [(eq? status 'KEY_PAIR_END)
            (set! keys (cdr keys))
-           (key-end ch)]
+           (values 'KEY_START #t #f #f)]
           [(eq? status 'ATTR_KEY_END)
            (let ([key (string-join (reverse keys) ".")])
-             (printf "attr key:[~a]\n" key)
              (if (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
                  (begin
                    (set! waiting_key key)
@@ -59,9 +59,7 @@
                  (values 'ATTR_KEY_WAITING #t #f #f)))]
           [(eq? status 'ATTR_VALUE_END)
            (when waiting_key
-             (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys)))
-             (printf "hash set: [~a]->[~a]\n" waiting_key (car  keys)))
-
+             (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys))))
            (set! keys (cddr keys))
            (set! waiting_key #f)
            (attr-value-end ch)]
@@ -69,15 +67,13 @@
            (let* ([key (if (> (length keys) 1)
                            (string-join (reverse keys) ".")
                            (car keys))])
-             (printf "key:[~a]\n" key)
              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
                (set! waiting_key key))
 
              (values 'KEY_VALUE_READING #t #f #f))]
           [(eq? status 'KEY_VALUE_END)
            (when waiting_key
-             (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys)))
-             (printf "hash set: [~a]->[~a]\n" waiting_key (car  keys)))
+             (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys))))
            (set! keys (cdr keys))
            (set! waiting_key #f)
            (values 'KEY_START #f #f #f)]

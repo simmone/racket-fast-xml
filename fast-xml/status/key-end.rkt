@@ -8,6 +8,8 @@
 
 (define (key-end ch)
   (cond
+   [(char=? ch #\space)
+    (values 'ATTR_KEY_WAITING #f #f #t)]
    [(char=? ch #\>)
     (values 'KEY_START #f #f #f)]
    [else

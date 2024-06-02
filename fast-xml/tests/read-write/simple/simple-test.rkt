@@ -25,8 +25,6 @@
               "basic1.value"
               ))])
 
-      (printf "~a\n" xml_hash)
-
       (check-equal? (hash-count xml_hash) 4)
 
       (check-equal? (hash-ref xml_hash "?xml.version") '("1.0"))
