@@ -8,6 +8,7 @@
 (define (STATUS? status)
   (if (not (memq status
                  '(
+                   TRAVERSE_START
                    KEY_START
                    KEY_READING
                    KEY_READING_END
@@ -19,6 +20,7 @@
                    ATTR_VALUE_END
                    KEY_END
                    KEY_VALUE_READING
+                   TRAVERSE_END
                    )))
       #f
       #t))

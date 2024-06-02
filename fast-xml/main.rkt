@@ -28,7 +28,7 @@
   (let ([xml_hash (make-hash)]
         [def_hash (defs-to-hash def_list)])
     (let loop ([status 'KEY_START]
-               [ch (read-char xml_port)]
+               [ch #f]
                [keys '()]
                [chars '()]
                [waiting_key #f])
@@ -36,10 +36,10 @@
       (printf "~a,~a,~a,~a,~a\n" status ch keys chars waiting_key)
 
       (when (not (eof-object? ch))
-
         (define-values
-            (next_status reserve_key? reserve_char?)
+            (next_status read_char? reserve_key? reserve_char?)
           (cond
+          [(eq? status 'TRAVERSE_START) (values 'KEY_START #t #f #f)]
           [(eq? status 'KEY_START) (key-start ch)]
           [(eq? status 'KEY_READING) (key-reading ch)]
           [(eq? status 'KEY_VALUE_READING) (key-value-reading ch)]
@@ -83,9 +83,7 @@
 
         (loop
          next_status
-         (if (eq? status 'KEY_READING_END)
-             ch
-             (read-char xml_port))
+         (if read_char? (read-char xml_port) ch)
          (if reserve_key? (cons (list->string (reverse chars)) keys) keys)
          (if reserve_char? (cons ch chars) '())
          waiting_key))
