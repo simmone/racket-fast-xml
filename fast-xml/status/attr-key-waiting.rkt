@@ -3,17 +3,17 @@
 (require "../lib.rkt")
 
 (provide (contract-out
-          [attr-key-waiting (-> char? (values STATUS? boolean? boolean?))]
+          [attr-key-waiting (-> char? (values STATUS? boolean? boolean? boolean?))]
           ))
 
 (define (attr-key-waiting ch)
   (cond
    [(char=? ch #\space)
-    (values 'ATTR_KEY_WAITING #f #f)]
+    (values 'ATTR_KEY_WAITING #t #f #f)]
    [(char=? ch #\>)
-    (values 'KEY_VALUE_READING #f #f)]
+    (values 'KEY_VALUE_READING #t #f #f)]
    [(char=? ch #\?)
-    (values 'KEY_END #f #f)]
+    (values 'KEY_END #t #f #f)]
    [else
-    (values 'ATTR_KEY_READING #f #t)]
+    (values 'ATTR_KEY_READING #t #f #t)]
    ))
