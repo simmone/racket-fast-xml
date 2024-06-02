@@ -10,6 +10,7 @@
                  '(
                    KEY_START
                    KEY_READING
+                   KEY_READING_END
                    ATTR_KEY_WAITING
                    ATTR_KEY_READING
                    ATTR_KEY_END

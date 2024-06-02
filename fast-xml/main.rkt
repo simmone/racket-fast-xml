@@ -15,6 +15,7 @@
          "status/attr-key-reading.rkt"
          "status/attr-value-waiting.rkt"
          "status/attr-value-reading.rkt"
+         "status/attr-value-end.rkt"
          )
 
 (define (xml-file-to-hash xml_file def_list)
@@ -42,11 +43,13 @@
           [(eq? status 'KEY_START) (key-start ch)]
           [(eq? status 'KEY_READING) (key-reading ch)]
           [(eq? status 'KEY_VALUE_READING) (key-value-reading ch)]
-          [(eq? status 'KEY_END) (key-end ch)]
           [(eq? status 'ATTR_KEY_WAITING) (attr-key-waiting ch)]
           [(eq? status 'ATTR_KEY_READING) (attr-key-reading ch)]
           [(eq? status 'ATTR_VALUE_WAITING) (attr-value-waiting ch)]
           [(eq? status 'ATTR_VALUE_READING) (attr-value-reading ch)]
+          [(eq? status 'KEY_END)
+           (set! keys (cdr keys))
+           (key-end ch)]
           [(eq? status 'ATTR_KEY_END)
            (let ([key (format "~a.~a"
                               (string-join (reverse keys) ".")
@@ -57,15 +60,32 @@
                    (set! waiting_key key)
                    (values 'ATTR_VALUE_READING #t #f))
                  (values 'ATTR_KEY_WAITING #f #f)))]
+          [(eq? status 'KEY_READING_END)
+           (set! chars (cdr chars))
+
+           (let* ([current_key (list->string (reverse chars))]
+                  [key (if (>= (length keys) 1)
+                           (string-join `(,@(reverse keys) ,current_key) ".")
+                           current_key)])
+             (printf "key:[~a]\n" key)
+             (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
+               (set! waiting_key key))
+
+             (values 'KEY_VALUE_READING #t #f))]
           [(eq? status 'ATTR_VALUE_END)
            (when waiting_key
-             (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(list->string (reverse chars))))
+             (hash-set! xml_hash waiting_key (list->string (reverse (cdr chars))))
+             (printf "~a,~a\n" waiting_key (list->string (reverse (cdr chars))))
+             (set! keys (cdr keys))
              (set! waiting_key  #f))
-           (values 'ATTR_KEY_WAITING #f #f)]))
+           (attr-value-end ch)]
+          ))
 
         (loop
          next_status
-         (read-char xml_port)
+         (if (eq? status 'KEY_READING_END)
+             ch
+             (read-char xml_port))
          (if reserve_key? (cons (list->string (reverse chars)) keys) keys)
          (if reserve_char? (cons ch chars) '())
          waiting_key))
