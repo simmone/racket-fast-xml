@@ -32,60 +32,61 @@
                [chars '()]
                [waiting_key #f])
 
-;      (printf "~a,~a,[~a],~a,~a\n" status ch keys chars waiting_key)
+      (printf "~a,~a,[~a],~a,~a\n" status ch keys chars waiting_key)
 
       (when (not (eof-object? ch))
         (define-values
             (next_status read_char? reserve_key? reserve_char?)
           (cond
-          [(eq? status 'TRAVERSE_START) (values 'KEY_START #f #f #f)]
-          [(eq? status 'KEY_START) (key-start ch)]
-          [(eq? status 'KEY_READING) (key-reading ch)]
-          [(eq? status 'KEY_VALUE_READING) (key-value-reading ch)]
-          [(eq? status 'ATTR_KEY_WAITING) (attr-key-waiting ch)]
-          [(eq? status 'ATTR_KEY_READING) (attr-key-reading ch)]
-          [(eq? status 'ATTR_VALUE_WAITING) (attr-value-waiting ch)]
-          [(eq? status 'ATTR_VALUE_READING) (attr-value-reading ch)]
-          [(eq? status 'KEY_END) (key-end ch)]
-          [(eq? status 'KEY_PAIR_END)
-           (set! keys (cdr keys))
-           (values 'KEY_START #t #f #f)]
-          [(eq? status 'ATTR_KEY_END)
-           (let ([key (string-join (reverse keys) ".")])
-             (if (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
-                 (begin
-                   (set! waiting_key key)
-                   (values 'ATTR_VALUE_READING #t #f #f))
-                 (values 'ATTR_KEY_WAITING #t #f #f)))]
-          [(eq? status 'ATTR_VALUE_END)
-           (when waiting_key
-             (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys))))
-           (set! keys (cddr keys))
-           (set! waiting_key #f)
-           (attr-value-end ch)]
-          [(eq? status 'KEY_READING_END)
-           (let* ([key (if (> (length keys) 1)
-                           (string-join (reverse keys) ".")
-                           (car keys))])
-             (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
-               (set! waiting_key key))
+           [(eq? status 'TRAVERSE_START) (values 'KEY_START #f #f #f)]
+           [(eq? status 'KEY_START) (key-start ch)]
+           [(eq? status 'KEY_READING) (key-reading ch)]
+           [(eq? status 'KEY_VALUE_READING) (key-value-reading ch)]
+           [(eq? status 'ATTR_KEY_WAITING) (attr-key-waiting ch)]
+           [(eq? status 'ATTR_KEY_READING) (attr-key-reading ch)]
+           [(eq? status 'ATTR_VALUE_WAITING) (attr-value-waiting ch)]
+           [(eq? status 'ATTR_VALUE_READING) (attr-value-reading ch)]
+           [(eq? status 'KEY_END) (key-end ch)]
+           [(eq? status 'KEY_PAIR_END)
+            (set! keys (cdr keys))
+            (values 'KEY_START #t #f #f)]
+           [(eq? status 'ATTR_KEY_END)
+            (let ([key (string-join (reverse keys) ".")])
+              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
+                (set! waiting_key key)))
 
-             (values 'KEY_VALUE_READING #t #f #f))]
-          [(eq? status 'KEY_VALUE_END)
-           (when waiting_key
-             (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys))))
-           (set! keys (cdr keys))
-           (set! waiting_key #f)
-           (values 'KEY_START #f #f #f)]
-          ))
+            (set! keys (cdr keys))
+            (values 'ATTR_VALUE_READING #t #f #f)]
+           [(eq? status 'ATTR_VALUE_END)
+            (when waiting_key
+              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys))))
+            (set! keys (cdr keys))
+            (set! waiting_key #f)
+            (attr-value-end ch)]
+           [(eq? status 'KEY_READING_END)
+            (let* ([key (if (> (length keys) 1)
+                            (string-join (reverse keys) ".")
+                            (car keys))])
+              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
+                (set! waiting_key key))
+
+              (values 'KEY_VALUE_READING #t #f #f))]
+           [(eq? status 'KEY_VALUE_END)
+            (when waiting_key
+              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys))))
+            (set! keys (cdr keys))
+            (set! waiting_key #f)
+            (values 'KEY_START #f #f #f)]
+           ))
 
         (loop
          next_status
          (if read_char? (read-char xml_port) ch)
          (if reserve_key? (cons (list->string (reverse chars)) keys) keys)
          (if reserve_char? (cons ch chars) '())
-         waiting_key))
-    xml_hash)))
+         waiting_key)))
+    (printf "xml_hash:~a\n" xml_hash)
+    xml_hash))
 
 (define (lists-to-xml xml_list)
   (add-xml-head (lists-to-xml_content xml_list)))

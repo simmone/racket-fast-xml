@@ -7,6 +7,9 @@
 
 (define-runtime-path simple1_xml_file "simple1.xml")
 (define-runtime-path simple2_xml_file "simple2.xml")
+(define-runtime-path simple3_xml_file "simple3.xml")
+(define-runtime-path simple4_xml_file "simple4.xml")
+(define-runtime-path simple5_xml_file "simple5.xml")
 
 (define test-simple
   (test-suite
@@ -21,18 +24,15 @@
             '(
               "?xml.version"
               "?xml.encoding"
-              "?xml.standalone"
               "basic1.value"
               ))])
 
-      (check-equal? (hash-count xml_hash) 4)
+      (check-equal? (hash-count xml_hash) 3)
 
       (check-equal? (hash-ref xml_hash "?xml.version") '("1.0"))
 
       (check-equal? (hash-ref xml_hash "?xml.encoding") '("UTF-8"))
 
-      (check-equal? (hash-ref xml_hash "?xml.standalone") '("yes"))
-      
       (check-equal? (hash-ref xml_hash "basic1.value") '("1"))
       ))
 
@@ -55,6 +55,42 @@
       (check-equal? (hash-count xml_hash) 1)
       
       (check-equal? (hash-ref xml_hash "h1.h2.topic") '("cx"))
+      ))
+
+   (test-case
+    "test-simple3-xml"
+
+    (let ([xml_hash
+           (xml-file-to-hash
+            simple3_xml_file
+            '("h1.h2.topic"))])
+      (check-equal? (hash-count xml_hash) 1)
+      
+      (check-equal? (hash-ref xml_hash "h1.h2.topic") '("cx"))
+      ))
+
+   (test-case
+    "test-simple4-xml"
+
+    (let ([xml_hash
+           (xml-file-to-hash
+            simple4_xml_file
+            '("h1.h2.topic"))])
+      (check-equal? (hash-count xml_hash) 1)
+      
+      (check-equal? (hash-ref xml_hash "h1.h2.topic") '("cx"))
+      ))
+
+   (test-case
+    "test-simple5-xml"
+
+    (let ([xml_hash
+           (xml-file-to-hash
+            simple5_xml_file
+            '("h1.h2.topic"))])
+      (check-equal? (hash-count xml_hash) 1)
+      
+      (check-equal? (hash-ref xml_hash "h1.h2.topic") '(" cx "))
       ))
   ))
 

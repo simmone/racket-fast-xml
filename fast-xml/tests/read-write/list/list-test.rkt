@@ -17,10 +17,13 @@
     (let ([xml_hash
            (xml-file-to-hash
             list1_xml_file
-            '("list.child"))])
-      (check-equal? (hash-count xml_hash) 3)
+            '(
+              "list.child"
+              "list.child.attr"))])
+      (check-equal? (hash-count xml_hash) 2)
       
       (check-equal? (hash-ref xml_hash "list.child") '("c1" "c2" "c3"))
+      (check-equal? (hash-ref xml_hash "list.child.attr") '("a1" "a2" "a3"))
       ))
 
    (test-case
