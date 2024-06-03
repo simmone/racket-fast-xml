@@ -35,10 +35,12 @@
           (let loop-items ([items def_items]
                            [last_keys '()])
             (when (not (null? items))
-              (let ([keys (cons (car items) last_keys)])
-                (if (= (length items) 1)
-                    (hash-set! def_hash (string-join (reverse keys) ".") 'v)
-                    (hash-set! def_hash (string-join (reverse keys) ".") 'k))
+              (let* ([keys (cons (car items) last_keys)]
+                     [key (string-join (reverse keys) ".")])
+                (when (not (eq? (hash-ref def_hash key 'k) 'v))
+                  (if (= (length items) 1)
+                      (hash-set! def_hash key 'v)
+                      (hash-set! def_hash key 'k)))
                 (loop-items (cdr items) keys)))))
         (loop-def (cdr defs))))
-    def_hash))        
+    def_hash))
