@@ -32,7 +32,7 @@
                [chars '()]
                [waiting_key #f])
 
-      (printf "~a,~a,[~a],~a,~a\n" status ch keys chars waiting_key)
+;      (printf "~a,~a,[~a],~a,~a\n" status ch keys chars waiting_key)
 
       (when (not (eof-object? ch))
         (define-values
@@ -61,7 +61,10 @@
             (when waiting_key
               (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys))))
             (set! keys (cdr keys))
-            (set! waiting_key #f)
+            (let ([key (string-join (reverse keys) ".")])
+              (if (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
+                  (set! waiting_key key)
+                  (set! waiting_key #f)))
             (attr-value-end ch)]
            [(eq? status 'KEY_READING_END)
             (let* ([key (if (> (length keys) 1)
@@ -85,7 +88,6 @@
          (if reserve_key? (cons (list->string (reverse chars)) keys) keys)
          (if reserve_char? (cons ch chars) '())
          waiting_key)))
-    (printf "xml_hash:~a\n" xml_hash)
     xml_hash))
 
 (define (lists-to-xml xml_list)

@@ -13,4 +13,4 @@
    [(char=? ch #\>)
     (values 'KEY_START #f #f #f)]
    [else
-    (values 'KEY_VALUE_READING #t #t #f)]))
+    (values 'KEY_VALUE_READING #f #f #f)]))
