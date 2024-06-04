@@ -3,7 +3,7 @@
 (require rackunit/text-ui
          rackunit
          racket/runtime-path
-         "../../../main.rkt")
+         "../../main.rkt")
 
 (define-runtime-path list1_xml_file "list1.xml")
 (define-runtime-path list2_xml_file "list2.xml")

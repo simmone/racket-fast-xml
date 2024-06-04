@@ -32,7 +32,7 @@
                [chars '()]
                [waiting_key #f])
 
-;      (printf "~a,~a,[~a],~a,~a\n" status ch keys chars waiting_key)
+      (printf "~a,~a,[~a],~a,~a\n" status ch keys chars waiting_key)
 
       (when (not (eof-object? ch))
         (define-values
