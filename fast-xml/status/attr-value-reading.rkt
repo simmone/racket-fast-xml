@@ -9,6 +9,6 @@
 (define (attr-value-reading ch)
   (cond
    [(char=? ch #\")
-    (values 'ATTR_VALUE_END #t #t #f)]
+    (values 'ATTR_VALUE_END #f #t #f)]
    [else
     (values 'ATTR_VALUE_READING #t #f #t)]))

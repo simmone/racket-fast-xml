@@ -32,7 +32,7 @@
                [chars '()]
                [waiting_key #f])
 
-      (printf "~a,~a,[~a],~a,~a\n" status ch keys chars waiting_key)
+;      (printf "~a,~a,[~a],~a,~a\n" status ch keys chars waiting_key)
 
       (when (not (eof-object? ch))
         (define-values
@@ -54,13 +54,11 @@
             (let ([key (string-join (reverse keys) ".")])
               (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
                 (set! waiting_key key)))
-
-            (set! keys (cdr keys))
             (values 'ATTR_VALUE_READING #t #f #f)]
            [(eq? status 'ATTR_VALUE_END)
             (when waiting_key
               (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys))))
-            (set! keys (cdr keys))
+            (set! keys (cddr keys))
             (let ([key (string-join (reverse keys) ".")])
               (if (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
                   (set! waiting_key key)

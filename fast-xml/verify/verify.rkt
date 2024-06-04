@@ -16,21 +16,23 @@
 (define-runtime-path data_xml_file "data.xml")
 (define-runtime-path show_file "show.md")
 
-(define (xml-file-to-hash xml_file def_list out_port)
+(define (xml-file-to-hash xml_file def_list stderr_port out_port)
   (with-input-from-file xml_file
     (lambda ()
-      (xml-port-to-hash (current-input-port) def_list out_port))))
+      (xml-port-to-hash (current-input-port) def_list stderr_port out_port))))
 
-(define (xml-port-to-hash xml_port def_list out_port)
+(define (xml-port-to-hash xml_port def_list stderr_port out_port)
   (let ([xml_hash (make-hash)]
         [def_hash (defs-to-hash def_list)])
     (let loop ([status 'TRAVERSE_START]
                [ch (read-char xml_port)]
+               [count 0]
                [keys '()]
                [chars '()]
                [waiting_key #f])
 
-
+      (when (= (remainder count (* 1024 1024 1)) 0)
+        (fprintf stderr_port "~aMk\n" (/ count (* 1024 1024 1))))
 
       (when (not (eof-object? ch))
         (define-values
@@ -80,30 +82,33 @@
             (values 'KEY_START #f #f #f)]
            ))
 
-        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_key)
+;        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_key)
 
         (loop
          next_status
          (if read_char? (read-char xml_port) ch)
+         (if read_char? (add1 count) count)
          (if reserve_key? (cons (list->string (reverse chars)) keys) keys)
          (if reserve_char? (cons ch chars) '())
          waiting_key)))
     xml_hash))
 
-(with-output-to-file
- show_file
- #:exists 'replace
- (lambda ()
-   (printf "| Status | Char | Keys | Chars | Waiting Key|\n")
-   (printf "|--------|------|------|-------|------------|\n")
+(let ([stderr_port (current-error-port)])
+  (with-output-to-file
+      show_file
+    #:exists 'replace
+    (lambda ()
+      (printf "| Status | Char | Keys | Chars | Waiting Key|\n")
+      (printf "|--------|------|------|-------|------------|\n")
 
-   (let ([xml_hash (xml-file-to-hash
-                    data_xml_file
-                    '(
-                      "?xml.version"
-                      "?xml.encoding"
-                      "basic1.value"
-                      )
-                    (current-output-port))])
+      (let ([xml_hash (xml-file-to-hash
+                       data_xml_file
+                       '(
+                         "?xml.version"
+                         "?xml.encoding"
+                         "basic1.value"
+                         )
+                       stderr_port
+                       stderr_port)])
 
-     (printf "\n\n~a\n" xml_hash))))
+        (printf "\n\n~a\n" xml_hash)))))
