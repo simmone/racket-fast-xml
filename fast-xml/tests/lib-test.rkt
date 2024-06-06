@@ -27,7 +27,7 @@
       (check-eq? (hash-ref def_hash "h1.h2.h3.topic") 'v))
 
     (let ([def_hash (defs-to-hash
-                      '(("h1.h2.h3.topic" . v) ("h3.h4.h5.v" . v))))])
+                      '(("h1.h2.h3.topic" . v) ("h3.h4.h5.v" . v)))])
       (check-equal? (hash-count def_hash) 8)
 
       (check-eq? (hash-ref def_hash "h1") 'k)

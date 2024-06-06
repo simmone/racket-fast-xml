@@ -1,7 +1,7 @@
 #lang racket
 
 (provide (contract-out
-          [defs-to-hash (-> (listof string?) hash?)]
+          [defs-to-hash (-> (listof (cons/c string? (or/c 'k 'v 'a))) hash?)]
           [STATUS? (-> symbol? boolean?)]
           ))
 
@@ -31,16 +31,19 @@
   (let ([def_hash (make-hash)])
     (let loop-def ([defs def_list])
       (when (not (null? defs))
-        (let ([def_items (regexp-split #rx"\\." (car defs))])
+
+        (hash-set! def_hash (caar defs) (cdar defs))
+
+        (let ([def_items (regexp-split #rx"\\." (caar defs))])
           (let loop-items ([items def_items]
                            [last_keys '()])
             (when (not (null? items))
               (let* ([keys (cons (car items) last_keys)]
-                     [key (string-join (reverse keys) ".")])
-                (when (not (eq? (hash-ref def_hash key 'k) 'v))
-                  (if (= (length items) 1)
-                      (hash-set! def_hash key 'v)
-                      (hash-set! def_hash key 'k)))
+                     [key (string-join (reverse keys) ".")]
+                     [type (hash-ref def_hash key 'k)])
+
+                (hash-set! def_hash key type)
+
                 (loop-items (cdr items) keys)))))
         (loop-def (cdr defs))))
     def_hash))
