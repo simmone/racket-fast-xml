@@ -82,7 +82,7 @@
             (values 'KEY_START #f #f #f)]
            ))
 
-;        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_key)
+        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_key)
 
         (loop
          next_status
@@ -103,12 +103,8 @@
 
       (let ([xml_hash (xml-file-to-hash
                        data_xml_file
-                       '(
-                         "?xml.version"
-                         "?xml.encoding"
-                         "basic1.value"
-                         )
+                       '("empty" "empty.attr1" "empty.attr2")
                        stderr_port
-                       stderr_port)])
+                       (current-output-port))])
 
         (printf "\n\n~a\n" xml_hash)))))

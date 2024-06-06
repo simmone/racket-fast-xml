@@ -4,7 +4,7 @@
 
 Use xml-to-hash, specify the element/attribute's hierach, ie: "list.a.v", then you can use hash-ref to get xml element/attribute as a list.
 
-Use lists-to-xml(lists->compact_xml), convert recursive list to generate xml, remove redundant format, more readable.
+Use lists-to-xml(lists-to-compact_xml), convert recursive list to generate xml, remove redundant format, more readable.
 
 @author+email["Chen Xiao" "chenxiao770117@gmail.com"]
 
@@ -14,7 +14,7 @@ Use lists-to-xml(lists->compact_xml), convert recursive list to generate xml, re
 
 raco pkg install fast-xml
 
-@section{xml->hash}
+@section{xml-to-hash}
 
 @codeblock{
   (xml-to-hash (or/c path-string? (listof string?) input-port?)) -> hash?
@@ -34,30 +34,35 @@ xml:
 </empty>
 }
 
-xml->hash:
+xml-to-hash:
 @codeblock{
-(let ([xml_hash (xml->hash "empty.xml")])
-  (printf "xml hash has ~a pairs.\n" (hash-count xml_hash))
+(let ([xml_hash (xml-file-to-hash
+                 empty2_xml_file
+                 '("empty" "empty.attr1" "empty.attr2")
+                )])
+  (printf "xml hash has ~a keys.\n" (hash-count xml_hash))
 
-  (printf "empty's count: ~a\n" (hash-ref xml_hash "empty's count"))
+  (printf "empty: ~a\n" (hash-ref xml_hash "empty"))
 
-  (printf "empty.attr1: [~a]\n" (hash-ref xml_hash "empty1.attr1"))
+  (printf "empty.attr1: ~a\n" (hash-ref xml_hash "empty.attr1"))
 
-  (printf "empty.attr2: [~a]\n" (hash-ref xml_hash "empty1.attr2"))
-
-  (printf "empty's content: [~a]\n" (hash-ref xml_hash "empty1"))
+  (printf "empty.attr2: ~a\n" (hash-ref xml_hash "empty.attr2"))
 )
 
-xml hash has 4 pairs.
-empty's count: 1
-empty1.attr1: [a1]
-empty1.attr2: [a2]
-empty1's content: []
+xml hash has 3 keys.
+empty: '("")
+empty.attr1: '("a1")
+empty.attr2: '("a2")
+}
+
+Be careful, if xml is below style, then node "empty" can't get value.
+@codeblock{
+<empty attr1="a1" attr2="a2"/>
 }
 
 @subsection{Hierachy}
 
-XML is a hierachy structure text format. So, xml->hash refect the hierachy information.
+XML is a hierachy structure text format. So, xml-to-hash refect the hierachy information.
 You access a node's attribute or content, you should give all the ancester's name in order.
 
 xml:
@@ -71,9 +76,9 @@ xml:
 </level1>
 }
 
-xml->hash:
+xml-to-hash:
 @codeblock{
-(let ([xml_hash (xml->hash "hierachy.xml")])
+(let ([xml_hash (xml-to-hash "hierachy.xml")])
   ;; if each node is the unique, so each node must append serial "1" at the end.
   (printf "level11.level21.level31.attr: [~a]\n" (hash-ref xml_hash "level11.level21.level31.attr"))
 
@@ -86,7 +91,7 @@ level11.level21.level31.level41: [Hello Xml!]
 
 @subsection{Count and List}
 
-XML's node can occur once or more than once. So xml->hash count all the node.
+XML's node can occur once or more than once. So xml-to-hash count all the node.
 In result hash, you can get all node's occurence count.
 
 How? Use "'s count" suffix.
@@ -100,9 +105,9 @@ xml:
 </list>
 }
 
-xml->hash:
+xml-to-hash:
 @codeblock{
-(let ([xml_hash (xml->hash "list.xml")])
+(let ([xml_hash (xml-to-hash "list.xml")])
   (printf "xml hash has ~a pairs.\n" (hash-count xml_hash))
 
   (printf "list's count: [~a]\n" (hash-ref xml_hash "list's count"))
@@ -149,10 +154,10 @@ child[2]'s attr:[a2] and content:[c2]
 child[3]'s attr:[a3] and content:[c3]
 }
 
-@section{lists->xml}
+@section{lists-to-xml}
 
 @codeblock{
-  (lists->xml list?) -> string?
+  (lists-to-xml list?) -> string?
 }
 
 convert lists to xml, the list should obey below rules.
@@ -185,7 +190,7 @@ convert lists to xml, the list should obey below rules.
    }
 
 @codeblock{
-  (lists->compact_xml list?) -> string?
+  (lists-to-compact_xml list?) -> string?
 }
 
 remove all the format characters.
@@ -194,9 +199,9 @@ remove all the format characters.
    '("H1" ("H2" "haha")) -> <H1><H2>haha</H2></H1>
 }
 
-@section{lists->xml_content and xml-trim}
+@section{lists-to-xml_content and xml-trim}
 
-lists->xml_content turn lists to xml without header.
+lists-to-xml_content turn lists to xml without header.
 
 xml-trim to generate compact xml.
 

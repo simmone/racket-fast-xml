@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<children>
+  <child1 attr1="a1">c1</child1>
+  <child2 attr1="a1">c2</child2>
+</children>
