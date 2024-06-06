@@ -4,6 +4,7 @@
           [xml-file-to-hash (-> path-string? (listof string?) hash?)]
           [xml-port-to-hash (-> input-port? (listof string?) hash?)]
           [lists-to-xml (-> list? string?)]
+          [lists-to-compact_xml (-> list? string?)]
           ))
 
 (require "lib.rkt"
