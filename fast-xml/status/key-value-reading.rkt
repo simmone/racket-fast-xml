@@ -8,7 +8,7 @@
 
 (define (key-value-reading ch)
   (cond
-   [(char=? ch #\<)
+   [(or (char=? ch #\<) (char=? ch #\/))
     (values 'KEY_VALUE_END #f #t #f)]
    [else
     (values 'KEY_VALUE_READING #t #f #t)]

@@ -22,6 +22,7 @@
                    KEY_VALUE_READING
                    KEY_VALUE_END
                    KEY_PAIR_END
+                   KEY_PAIR_END_NO_VALUE
                    TRAVERSE_END
                    )))
       #f

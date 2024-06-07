@@ -48,11 +48,12 @@
            [(eq? status 'ATTR_VALUE_READING) (attr-value-reading ch)]
            [(eq? status 'KEY_END) (key-end ch)]
            [(eq? status 'KEY_PAIR_END)
+            (printf "~a\n" waiting_key)
             (set! keys (cdr keys))
             (values 'KEY_START #t #f #f)]
            [(eq? status 'ATTR_KEY_END)
             (let ([key (string-join (reverse keys) ".")])
-              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
+              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'a))
                 (set! waiting_key key)))
 
             (set! keys (cdr keys))
@@ -77,6 +78,12 @@
            [(eq? status 'KEY_VALUE_END)
             (when waiting_key
               (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys))))
+            (set! keys (cdr keys))
+            (set! waiting_key #f)
+            (values 'KEY_START #f #f #f)]
+           [(eq? status 'KEY_PAIR_END_NO_VALUE)
+            (when waiting_key
+              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) "")))
             (set! keys (cdr keys))
             (set! waiting_key #f)
             (values 'KEY_START #f #f #f)]
@@ -112,4 +119,4 @@
             (current-output-port)
             )])
 
-        (printf "\n\n~a\n" xml_hash)))))
+        (printf "\n\n~a, ~a, ~a\n" (length (hash-ref xml_hash "list.child")) (length (hash-ref xml_hash "list.child.attr")) xml_hash)))))
