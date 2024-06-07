@@ -1,7 +1,7 @@
 #lang racket
 
 (provide (contract-out
-          [defs-to-hash (-> (listof (cons/c string? (or/c 'k 'v 'a))) hash?)]
+          [defs-to-hash (-> (listof (cons/c string? (or/c 'v 'a))) hash?)]
           [STATUS? (-> symbol? boolean?)]
           ))
 

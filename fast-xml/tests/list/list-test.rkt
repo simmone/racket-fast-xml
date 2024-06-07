@@ -7,6 +7,7 @@
 
 (define-runtime-path list1_xml_file "list1.xml")
 (define-runtime-path list2_xml_file "list2.xml")
+(define-runtime-path list3_xml_file "list3.xml")
 
 (define test-xml
   (test-suite
@@ -19,8 +20,9 @@
            (xml-file-to-hash
             list1_xml_file
             '(
-              "list.child"
-              "list.child.attr"))])
+              ("list.child" . v)
+              ("list.child.attr" . a)
+              ))])
       (check-equal? (hash-count xml_hash) 2)
       
       (check-equal? (hash-ref xml_hash "list.child") '("c1" "c2" "c3"))
@@ -47,12 +49,27 @@
            (xml-file-to-hash
             list2_xml_file
             '(
-              "list.child"
-              "list.child.attr"))])
+              ("list.child" . v)
+              ("list.child.attr" . a)
+              ))])
       (check-equal? (hash-count xml_hash) 2)
       
       (check-equal? (hash-ref xml_hash "list.child") '("c1" "c2" "c3" "c4" "c5" "c6"))
       (check-equal? (hash-ref xml_hash "list.child.attr") '("a1" "a2" "a3" "a4" "a5" "a6"))
+      ))
+
+   (test-case
+    "test-read-list3-xml"
+
+    (let ([xml_hash
+           (xml-file-to-hash
+            list3_xml_file
+            '(
+              ("list.child" . v)
+              ))])
+      (check-equal? (hash-count xml_hash) 2)
+      
+      (check-equal? (hash-ref xml_hash "list.child") '("c1" "" "c3"))
       ))
 
   ))

@@ -1,8 +1,8 @@
 #lang racket
 
 (provide (contract-out
-          [xml-file-to-hash (-> path-string? (listof string?) hash?)]
-          [xml-port-to-hash (-> input-port? (listof string?) hash?)]
+          [xml-file-to-hash (-> path-string? (listof (cons/c string? (or/c 'v 'a))) hash?)]
+          [xml-port-to-hash (-> input-port? (listof (cons/c string? (or/c 'v 'a))) hash?)]
           [lists-to-xml (-> list? string?)]
           [lists-to-compact_xml (-> list? string?)]
           ))

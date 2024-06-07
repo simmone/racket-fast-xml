@@ -2,6 +2,6 @@
 
 <list>
   <child attr="a1">c1</child>
-  <child>c2</child>
+  <child attr="a2"/>
   <child attr="a3">c3</child>
 </list>
