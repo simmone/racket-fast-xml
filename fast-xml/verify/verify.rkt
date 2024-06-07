@@ -101,10 +101,15 @@
       (printf "| Status | Char | Keys | Chars | Waiting Key|\n")
       (printf "|--------|------|------|-------|------------|\n")
 
-      (let ([xml_hash (xml-file-to-hash
-                       data_xml_file
-                       '("empty" "empty.attr1" "empty.attr2")
-                       stderr_port
-                       (current-output-port))])
+    (let ([xml_hash
+           (xml-file-to-hash
+            data_xml_file
+            '(
+              ("list.child" . v)
+              ("list.child.attr" . a)
+              )
+            stderr_port
+            (current-output-port)
+            )])
 
         (printf "\n\n~a\n" xml_hash)))))
