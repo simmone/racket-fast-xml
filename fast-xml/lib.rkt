@@ -47,8 +47,10 @@
                 (hash-set! def_hash key type)
                 
                 (when (eq? type 'a)
-                  (let ([node (string-join (reverse last_keys) ".")])
-                    (hash-set! attr_hash node `(,@(hash-ref attr_hash node '()) ,key))))
+                  (let* ([node (string-join (reverse last_keys) ".")]
+                         [default_hash (hash-ref attr_hash node (make-hash))])
+                    (hash-set! default_hash key #f)
+                    (hash-set! attr_hash node default_hash)))
 
                 (loop-items (cdr items) keys))))
           )

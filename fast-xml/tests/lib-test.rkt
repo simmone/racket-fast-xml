@@ -60,7 +60,11 @@
 
       (check-equal? (hash-count attr_hash) 1)
 
-      (check-equal? (hash-ref attr_hash "h1.h2.h4") '("h1.h2.h4.topic"))
+      (check-equal? (hash-count (hash-ref attr_hash "h1.h2.h4")) 1)
+
+      (check-false (hash-ref
+                    (hash-ref attr_hash "h1.h2.h4")
+                   "h1.h2.h4.topic"))
       )
 
     (let-values ([(def_hash attr_hash) (defs-to-hash '(("h1.h2.h3.topic" . a) ("h1.h2" . v)))])
@@ -72,7 +76,12 @@
       (check-eq? (hash-ref def_hash "h1.h2.h3.topic") 'a)
 
       (check-equal? (hash-count attr_hash) 1)
-      (check-equal? (hash-ref attr_hash "h1.h2.h3") '("h1.h2.h3.topic"))
+
+      (check-equal? (hash-count (hash-ref attr_hash "h1.h2.h3")) 1)
+
+      (check-false (hash-ref
+                    (hash-ref attr_hash "h1.h2.h3")
+                   "h1.h2.h3.topic"))
       )
 
     (let-values ([(def_hash attr_hash) (defs-to-hash '(("h1.h2" . v) ("h1.h2.h3.topic" . a) ("h1.h2.h3.content" . a)))])
@@ -85,7 +94,16 @@
       (check-eq? (hash-ref def_hash "h1.h2.h3.content") 'a)
 
       (check-equal? (hash-count attr_hash) 1)
-      (check-equal? (hash-ref attr_hash "h1.h2.h3") '("h1.h2.h3.topic" "h1.h2.h3.content"))
+
+      (check-equal? (hash-count (hash-ref attr_hash "h1.h2.h3")) 2)
+
+      (check-false (hash-ref
+                    (hash-ref attr_hash "h1.h2.h3")
+                   "h1.h2.h3.topic"))
+
+      (check-false (hash-ref
+                    (hash-ref attr_hash "h1.h2.h3")
+                   "h1.h2.h3.content"))
       )
     )
   ))
