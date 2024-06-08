@@ -3,6 +3,7 @@
 (require "../lib.rkt"
          "../status/key-start.rkt"
          "../status/key-reading.rkt"
+         "../status/key-reading-end.rkt"
          "../status/key-end.rkt"
          "../status/key-value-reading.rkt"
          "../status/attr-key-waiting.rkt"
@@ -36,6 +37,7 @@
                [keys '()]
                [chars '()]
                [waiting_key #f]
+               [key_value_obtained #f]
                [attr_hash #f])
 
       (when (= (remainder count (* 1024 1024 1)) 0)
@@ -65,37 +67,43 @@
             (let* ([key (if (> (length keys) 1)
                             (string-join (reverse keys) ".")
                             (car keys))])
-              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
-                (set! waiting_key key)))
 
-            (let* ([key (if (> (length keys) 1)
-                            (string-join (reverse keys) ".")
-                            (car keys))])
+              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
+                (set! waiting_key key)
+                (set! key_value_obtained #f))
+
               (when (hash-has-key? attr_def_hash key)
                 (set! attr_hash (hash-copy (hash-ref attr_def_hash key)))))
 
-            (values 'KEY_VALUE_READING #t #f #f)]
+            (key-reading-end ch)]
            [(eq? status 'KEY_PAIR_END)
             (let* ([key (if (> (length keys) 1)
                             (string-join (reverse keys) ".")
                             (car keys))])
 
-              (when (hash-has-key? def_hash key)
-                (printf "key:~a\n" key)
+              (if attr_hash
+                (hash-for-each
+                 attr_hash
+                 (lambda (k v)
+                   (when (not v)
+                   (hash-set! xml_hash k `(,@(hash-ref xml_hash k '()) "")))))
+                (when (hash-has-key? attr_def_hash key)
+                  (hash-for-each
+                   (hash-ref attr_def_hash key)
+                   (lambda (k v)
+                     (hash-set! xml_hash k `(,@(hash-ref xml_hash k '()) ""))))))
+
+              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v) (not key_value_obtained))
                 (hash-set! xml_hash key `(,@(hash-ref xml_hash key '()) ""))))
 
             (set! keys (cdr keys))
-            (when attr_hash
-              (hash-for-each
-               attr_hash
-               (lambda (k v)
-                 (when (not v)
-                   (hash-set! xml_hash k `(,@(hash-ref xml_hash k '()) ""))))))
+            (set! key_value_obtained #f)
             (set! attr_hash #f)
             (values 'KEY_START #t #f #f)]
            [(eq? status 'KEY_PAIR_END_NO_VALUE)
             (when waiting_key
-              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) "")))
+              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ""))
+              (set! key_value_obtained #t))
             (set! keys (cdr keys))
             (set! waiting_key #f)
             (set! attr_hash #f)
@@ -119,14 +127,15 @@
             (attr-value-end ch)]
            [(eq? status 'KEY_VALUE_END)
             (when waiting_key
-              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys))))
+              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys)))
+              (set! key_value_obtained #t))
 
             (set! keys (cdr keys))
             (set! waiting_key #f)
             (values 'KEY_START #f #f #f)]
            ))
 
-        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_key attr_hash)
+        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_key key_value_obtained attr_hash)
 
         (loop
          next_status
@@ -135,6 +144,7 @@
          (if reserve_key? (if (> (length chars) 0) (cons (list->string (reverse chars)) keys) keys) keys)
          (if reserve_char? (cons ch chars) '())
          waiting_key
+         key_value_obtained
          attr_hash)))
     xml_hash))
 
@@ -143,8 +153,8 @@
       show_file
     #:exists 'replace
     (lambda ()
-      (printf "| Status | Char | Keys | Chars | Waiting Key| Attr Hash |\n")
-      (printf "|--------|------|------|-------|------------|-----------|\n")
+      (printf "| Status | Char | Keys | Chars | Waiting Key| Key Value Obtained | Attr Hash |\n")
+      (printf "|--------|------|------|-------|------------|--------------------|-----------|\n")
 
     (let ([xml_hash
            (xml-file-to-hash
