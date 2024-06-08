@@ -18,7 +18,7 @@
            (xml-file-to-hash
             attr1_xml_file
             '(
-              "worksheet.xmlns"
+              ("worksheet.xmlns" . a)
               ))])
 
       (check-equal? (hash-count xml_hash) 1)
