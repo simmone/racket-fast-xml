@@ -100,14 +100,6 @@
             (set! key_value_obtained #f)
             (set! attr_hash #f)
             (values 'KEY_START #t #f #f)]
-           [(eq? status 'KEY_PAIR_END_NO_VALUE)
-            (when waiting_key
-              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ""))
-              (set! key_value_obtained #t))
-            (set! keys (cdr keys))
-            (set! waiting_key #f)
-            (set! attr_hash #f)
-            (values 'KEY_START #f #f #f)]
            [(eq? status 'ATTR_KEY_END)
             (let ([key (string-join (reverse keys) ".")])
               (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'a))
@@ -116,21 +108,21 @@
             (set! keys (cdr keys))
             (values 'ATTR_VALUE_READING #t #f #f)]
            [(eq? status 'ATTR_VALUE_END)
-            (when waiting_key
-              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys)))
+            (when (and waiting_key (hash-has-key? def_hash waiting_key) (eq? (hash-ref def_hash waiting_key) 'a))
+              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(list->string (reverse (cdr chars)))))
               (hash-set! attr_hash waiting_key #t))
-            (set! keys (cdr keys))
+
             (let ([key (string-join (reverse keys) ".")])
               (if (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
                   (set! waiting_key key)
                   (set! waiting_key #f)))
+
             (attr-value-end ch)]
            [(eq? status 'KEY_VALUE_END)
             (when waiting_key
-              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(car keys)))
+              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(list->string (reverse (cdr chars)))))
               (set! key_value_obtained #t))
 
-            (set! keys (cdr keys))
             (set! waiting_key #f)
             (values 'KEY_START #f #f #f)]
            ))
@@ -160,20 +152,15 @@
            (xml-file-to-hash
             data_xml_file
             '(
-              ("children.child1" . v)
-              ("children.child1.attr1" . a)
-              ("children.child2" .  v)
-              ("children.child2.attr1" . a)
+              ("list.child" . v)
+              ("list.child.attr" . a)
               )
             stderr_port
             (current-output-port)
             )])
 
-      (check-equal? (hash-count xml_hash) 4)
-
-      (check-equal? (hash-ref xml_hash "children.child1") '("c1" ""))
-      (check-equal? (hash-ref xml_hash "children.child1.attr1") '("a1" ""))
-
-      (check-equal? (hash-ref xml_hash "children.child2") '("c2" "c3"))
-      (check-equal? (hash-ref xml_hash "children.child2.attr1") '("a2" ""))
+      (check-equal? (hash-count xml_hash) 2)
+      
+      (check-equal? (hash-ref xml_hash "list.child") '("c1" "c2" "c3"))
+      (check-equal? (hash-ref xml_hash "list.child.attr") '("a1" "a2" "a3"))
 ))))

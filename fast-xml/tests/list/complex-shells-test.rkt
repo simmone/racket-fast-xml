@@ -18,9 +18,10 @@
            (xml-file-to-hash
             complex_shells_xml_file
             '(
-              "worksheet.cols.col.min"
+              ("worksheet.cols.col.min" . a)
               )
               )])
+
       (check-equal? (hash-count xml_hash) 1)
       
       (check-equal? (hash-ref xml_hash "worksheet.cols.col.min") '("1" "3" "4" "8" "13" "14" "16" "17" "18"
