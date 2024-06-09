@@ -22,9 +22,9 @@
            (xml-file-to-hash
             simple1_xml_file
             '(
-              "?xml.version"
-              "?xml.encoding"
-              "basic1.value"
+              ("?xml.version" . a)
+              ("?xml.encoding" . a)
+              ("basic1.value" . v)
               ))])
 
       (check-equal? (hash-count xml_hash) 3)
@@ -51,7 +51,7 @@
     (let ([xml_hash
            (xml-file-to-hash
             simple2_xml_file
-            '("h1.h2.topic"))])
+            '(("h1.h2.topic" . v)))])
       (check-equal? (hash-count xml_hash) 1)
       
       (check-equal? (hash-ref xml_hash "h1.h2.topic") '("cx"))
@@ -63,7 +63,7 @@
     (let ([xml_hash
            (xml-file-to-hash
             simple3_xml_file
-            '("h1.h2.topic"))])
+            '(("h1.h2.topic" . v)))])
       (check-equal? (hash-count xml_hash) 1)
       
       (check-equal? (hash-ref xml_hash "h1.h2.topic") '("cx"))
@@ -75,7 +75,7 @@
     (let ([xml_hash
            (xml-file-to-hash
             simple4_xml_file
-            '("h1.h2.topic" "h1"))])
+            '(("h1.h2.topic" . v) ("h1" . v)))])
       (check-equal? (hash-count xml_hash) 2)
       
       (check-equal? (hash-ref xml_hash "h1.h2.topic") '("cx"))
@@ -88,7 +88,7 @@
     (let ([xml_hash
            (xml-file-to-hash
             simple5_xml_file
-            '("h1.h2.topic"))])
+            '(("h1.h2.topic" . v)))])
       (check-equal? (hash-count xml_hash) 1)
       
       (check-equal? (hash-ref xml_hash "h1.h2.topic") '(" cx "))

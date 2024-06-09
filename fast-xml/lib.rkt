@@ -21,6 +21,7 @@
                    ATTR_VALUE_END
                    KEY_END
                    KEY_VALUE_READING
+                   KEY_VALUE_END_MAYBE
                    KEY_VALUE_END
                    KEY_PAIR_END
                    TRAVERSE_END

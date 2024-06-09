@@ -14,6 +14,7 @@
          "status/key-reading-end.rkt"
          "status/key-end.rkt"
          "status/key-value-reading.rkt"
+         "status/key-value-end-maybe.rkt"
          "status/attr-key-waiting.rkt"
          "status/attr-key-reading.rkt"
          "status/attr-value-waiting.rkt"
@@ -25,7 +26,6 @@
   (with-input-from-file xml_file
     (lambda ()
       (xml-port-to-hash (current-input-port) def_list))))
-
 
 (define (xml-port-to-hash xml_port def_list)
   (let ([xml_hash (make-hash)])
@@ -52,6 +52,7 @@
            [(eq? status 'KEY_START) (key-start ch)]
            [(eq? status 'KEY_READING) (key-reading ch)]
            [(eq? status 'KEY_VALUE_READING) (key-value-reading ch)]
+           [(eq? status 'KEY_VALUE_END_MAYBE) (key-value-end-maybe ch)]
            [(eq? status 'ATTR_KEY_WAITING) (attr-key-waiting ch)]
            [(eq? status 'ATTR_KEY_READING) (attr-key-reading ch)]
            [(eq? status 'ATTR_VALUE_WAITING) (attr-value-waiting ch)]

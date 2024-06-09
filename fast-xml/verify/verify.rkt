@@ -7,6 +7,7 @@
          "../status/key-reading-end.rkt"
          "../status/key-end.rkt"
          "../status/key-value-reading.rkt"
+         "../status/key-value-end-maybe.rkt"
          "../status/attr-key-waiting.rkt"
          "../status/attr-key-reading.rkt"
          "../status/attr-value-waiting.rkt"
@@ -53,6 +54,7 @@
            [(eq? status 'KEY_START) (key-start ch)]
            [(eq? status 'KEY_READING) (key-reading ch)]
            [(eq? status 'KEY_VALUE_READING) (key-value-reading ch)]
+           [(eq? status 'KEY_VALUE_END_MAYBE) (key-value-end-maybe ch)]
            [(eq? status 'ATTR_KEY_WAITING) (attr-key-waiting ch)]
            [(eq? status 'ATTR_KEY_READING) (attr-key-reading ch)]
            [(eq? status 'ATTR_VALUE_WAITING) (attr-value-waiting ch)]
@@ -73,7 +75,6 @@
                                   #f)
                               #f)])
                      (when (not attr_setted)
-                       (printf "attr setted: ~a\n" k)
                        (hash-set! xml_hash k `(,@(hash-ref xml_hash k '()) "")))))))
 
               (when (hash-has-key? attr_def_hash key)
@@ -115,7 +116,6 @@
            [(eq? status 'ATTR_VALUE_END)
             (when (and waiting_key (hash-has-key? def_hash waiting_key) (eq? (hash-ref def_hash waiting_key) 'a))
               (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(list->string (reverse (cdr chars)))))
-              (printf "attr setted: ~a\n" waiting_key)
               (hash-set! attr_hash waiting_key #t))
 
             (let ([key (string-join (reverse keys) ".")])
@@ -158,15 +158,13 @@
            (xml-file-to-hash
             data_xml_file
             '(
-              ("list.child" . v)
-              ("list.child.attr" . a)
+              ("h1.h2.topic" . v)
               )
             stderr_port
             (current-output-port)
             )])
 
-      (check-equal? (hash-count xml_hash) 2)
+      (check-equal? (hash-count xml_hash) 1)
       
-      (check-equal? (hash-ref xml_hash "list.child") '("c1" "" "c3" "" "c4" "" "" ""))
-      (check-equal? (hash-ref xml_hash "list.child.attr") '("a1" "a2" "a3" "" "" "" "" "a6"))
+      (check-equal? (hash-ref xml_hash "h1.h2.topic") '(" cx "))
 ))))
