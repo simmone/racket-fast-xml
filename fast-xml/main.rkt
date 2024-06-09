@@ -9,6 +9,7 @@
 
 (require "lib.rkt"
          "status/key-start.rkt"
+         "status/key-waiting.rkt"
          "status/key-reading.rkt"
          "status/key-reading-end.rkt"
          "status/key-end.rkt"
@@ -24,6 +25,7 @@
   (with-input-from-file xml_file
     (lambda ()
       (xml-port-to-hash (current-input-port) def_list))))
+
 
 (define (xml-port-to-hash xml_port def_list)
   (let ([xml_hash (make-hash)])
@@ -45,7 +47,8 @@
         (define-values
             (next_status read_char? reserve_key? reserve_char?)
           (cond
-           [(eq? status 'TRAVERSE_START) (values 'KEY_START #f #f #f)]
+           [(eq? status 'TRAVERSE_START) (values 'KEY_WAITING #f #f #f)]
+           [(eq? status 'KEY_WAITING) (key-waiting ch)]
            [(eq? status 'KEY_START) (key-start ch)]
            [(eq? status 'KEY_READING) (key-reading ch)]
            [(eq? status 'KEY_VALUE_READING) (key-value-reading ch)]
@@ -69,7 +72,7 @@
                                   #f)
                               #f)])
                      (when (not attr_setted)
-                         (hash-set! xml_hash k `(,@(hash-ref xml_hash k '()) "")))))))
+                       (hash-set! xml_hash k `(,@(hash-ref xml_hash k '()) "")))))))
 
               (when (hash-has-key? attr_def_hash key)
                 (set! attr_hash (hash-copy (hash-ref attr_def_hash key)))))
@@ -99,7 +102,7 @@
 
             (set! keys (cdr keys))
             (set! key_value_obtained #f)
-            (values 'KEY_START #t #f #f)]
+            (values 'KEY_WAITING #t #f #f)]
            [(eq? status 'ATTR_KEY_END)
             (let ([key (string-join (reverse keys) ".")])
               (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'a))
@@ -124,7 +127,7 @@
               (set! key_value_obtained #t))
 
             (set! waiting_key #f)
-            (values 'KEY_END #f #f #f)]
+            (values 'KEY_WAITING #f #f #f)]
            ))
 
         (loop
