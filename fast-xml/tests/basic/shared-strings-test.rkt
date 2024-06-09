@@ -19,12 +19,12 @@
     (let ([xml_hash (xml-file-to-hash
                      sharedStrings_xml_file
                      '(
-                       "sst.count"
-                       "sst.uniqueCount"
-                       "sst.xmlns"
-                       "sst.si.t"
-                       "sst.si.phoneticPr.fontId"
-                       "sst.si.phoneticPr.type"
+                       ("sst.count" . a)
+                       ("sst.uniqueCount" . a)
+                       ("sst.xmlns" . a)
+                       ("sst.si.t" . v)
+                       ("sst.si.phoneticPr.fontId" . a)
+                       ("sst.si.phoneticPr.type" . a)
                        ))])
       
       (check-equal? (hash-ref xml_hash "sst.count") '("17"))

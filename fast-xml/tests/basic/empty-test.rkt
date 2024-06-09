@@ -17,10 +17,13 @@
 
     (let ([xml_hash (xml-file-to-hash
                      empty1_xml_file
-                     '("empty" "empty.attr1" "empty.attr2")
+                     '(
+                       ("empty" . v) ("empty.attr1" . a) ("empty.attr2" . a)
+                       )
                      )])
       
-      (check-equal? (hash-count xml_hash) 2)
+      (check-equal? (hash-count xml_hash) 3)
+      (check-equal? (hash-ref xml_hash "empty") '(""))
       (check-equal? (hash-ref xml_hash "empty.attr1") '("a1"))
       (check-equal? (hash-ref xml_hash "empty.attr2") '("a2"))
       )
@@ -31,7 +34,9 @@
 
     (let ([xml_hash (xml-file-to-hash
                      empty2_xml_file
-                     '("empty" "empty.attr1" "empty.attr2")
+                     '(
+                       ("empty" . v) ("empty.attr1" . a) ("empty.attr2" . a)
+                       )
                      )])
       
       (check-equal? (hash-count xml_hash) 3)
