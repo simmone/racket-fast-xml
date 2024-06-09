@@ -9,6 +9,7 @@
   (if (not (memq status
                  '(
                    TRAVERSE_START
+                   KEY_WAITING
                    KEY_START
                    KEY_READING
                    KEY_READING_END
@@ -22,7 +23,6 @@
                    KEY_VALUE_READING
                    KEY_VALUE_END
                    KEY_PAIR_END
-                   KEY_PAIR_END_NO_VALUE
                    TRAVERSE_END
                    )))
       #f

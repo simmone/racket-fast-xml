@@ -10,6 +10,8 @@
   (cond
    [(char=? ch #\/)
     (values 'KEY_PAIR_END #f #t #f)]
+   [(char=? ch #\>)
+    (values 'KEY_END #t #t #f)]
    [else
-    (values 'KEY_VALUE_READING #t #f #f)]
+    (values 'ATTR_KEY_WAITING #t #f #f)]
    ))

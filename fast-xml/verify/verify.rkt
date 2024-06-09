@@ -2,6 +2,7 @@
 
 (require "../lib.rkt"
          "../status/key-start.rkt"
+         "../status/key-waiting.rkt"
          "../status/key-reading.rkt"
          "../status/key-reading-end.rkt"
          "../status/key-end.rkt"
@@ -47,7 +48,8 @@
         (define-values
             (next_status read_char? reserve_key? reserve_char?)
           (cond
-           [(eq? status 'TRAVERSE_START) (values 'KEY_START #f #f #f)]
+           [(eq? status 'TRAVERSE_START) (values 'KEY_WAITING #f #f #f)]
+           [(eq? status 'KEY_WAITING) (key-waiting ch)]
            [(eq? status 'KEY_START) (key-start ch)]
            [(eq? status 'KEY_READING) (key-reading ch)]
            [(eq? status 'KEY_VALUE_READING) (key-value-reading ch)]
@@ -59,8 +61,25 @@
             (let* ([key (if (> (length keys) 1)
                             (string-join (reverse keys) ".")
                             (car keys))])
+
+              (when (hash-has-key? attr_def_hash key)
+                (hash-for-each
+                 (hash-ref attr_def_hash key)
+                 (lambda (k v)
+                   (let ([attr_setted
+                          (if attr_hash
+                              (if (hash-has-key? attr_hash k)
+                                  (hash-ref attr_hash k)
+                                  #f)
+                              #f)])
+                     (when (not attr_setted)
+                       (printf "attr setted: ~a\n" k)
+                       (hash-set! xml_hash k `(,@(hash-ref xml_hash k '()) "")))))))
+
               (when (hash-has-key? attr_def_hash key)
                 (set! attr_hash (hash-copy (hash-ref attr_def_hash key)))))
+
+            (set! attr_hash #f)
 
             (key-end ch)]
            [(eq? status 'KEY_READING_END)
@@ -80,26 +99,12 @@
             (let* ([key (if (> (length keys) 1)
                             (string-join (reverse keys) ".")
                             (car keys))])
-
-              (if attr_hash
-                (hash-for-each
-                 attr_hash
-                 (lambda (k v)
-                   (when (not v)
-                   (hash-set! xml_hash k `(,@(hash-ref xml_hash k '()) "")))))
-                (when (hash-has-key? attr_def_hash key)
-                  (hash-for-each
-                   (hash-ref attr_def_hash key)
-                   (lambda (k v)
-                     (hash-set! xml_hash k `(,@(hash-ref xml_hash k '()) ""))))))
-
               (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v) (not key_value_obtained))
                 (hash-set! xml_hash key `(,@(hash-ref xml_hash key '()) ""))))
 
             (set! keys (cdr keys))
             (set! key_value_obtained #f)
-            (set! attr_hash #f)
-            (values 'KEY_START #t #f #f)]
+            (values 'KEY_WAITING #t #f #f)]
            [(eq? status 'ATTR_KEY_END)
             (let ([key (string-join (reverse keys) ".")])
               (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'a))
@@ -110,6 +115,7 @@
            [(eq? status 'ATTR_VALUE_END)
             (when (and waiting_key (hash-has-key? def_hash waiting_key) (eq? (hash-ref def_hash waiting_key) 'a))
               (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(list->string (reverse (cdr chars)))))
+              (printf "attr setted: ~a\n" waiting_key)
               (hash-set! attr_hash waiting_key #t))
 
             (let ([key (string-join (reverse keys) ".")])
@@ -124,7 +130,7 @@
               (set! key_value_obtained #t))
 
             (set! waiting_key #f)
-            (values 'KEY_START #f #f #f)]
+            (values 'KEY_WAITING #f #f #f)]
            ))
 
         (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_key key_value_obtained attr_hash)
@@ -161,6 +167,6 @@
 
       (check-equal? (hash-count xml_hash) 2)
       
-      (check-equal? (hash-ref xml_hash "list.child") '("c1" "c2" "c3"))
-      (check-equal? (hash-ref xml_hash "list.child.attr") '("a1" "a2" "a3"))
+      (check-equal? (hash-ref xml_hash "list.child") '("c1" "" "c3" "" "c4" "" "" ""))
+      (check-equal? (hash-ref xml_hash "list.child.attr") '("a1" "a2" "a3" "" "" "" "" "a6"))
 ))))

@@ -11,6 +11,10 @@
    [(char=? ch #\space)
     (values 'ATTR_KEY_WAITING #f #f #t)]
    [(char=? ch #\>)
-    (values 'KEY_START #f #f #f)]
+    (values 'KEY_WAITING #t #f #f)]
+   [(char=? ch #\<)
+    (values 'KEY_WAITING #f #f #f)]
+   [(char=? ch #\/)
+    (values 'KEY_PAIR_END #f #f #f)]
    [else
     (values 'KEY_VALUE_READING #f #f #f)]))

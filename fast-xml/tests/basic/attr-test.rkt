@@ -19,11 +19,17 @@
             attr1_xml_file
             '(
               ("worksheet.xmlns" . a)
+              ("worksheet.cols.test" . a)
+              ("worksheet.cols.col.collapsed" . a)
               ))])
 
-      (check-equal? (hash-count xml_hash) 1)
+      (check-equal? (hash-count xml_hash) 3)
 
       (check-equal? (hash-ref xml_hash "worksheet.xmlns") '("http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
+
+      (check-equal? (hash-ref xml_hash "worksheet.cols.test") '("2"))
+
+      (check-equal? (hash-ref xml_hash "worksheet.cols.col.collapsed") '("1" "2" ""))
       ))
   ))
 

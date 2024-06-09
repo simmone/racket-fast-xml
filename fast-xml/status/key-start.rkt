@@ -7,10 +7,8 @@
           ))
 
 (define (key-start ch)
-  (values
-   (if (char=? ch #\<)
-       'KEY_READING
-       'KEY_START)
-   #t
-   #f
-   #f))
+  (cond
+   [(char=? ch #\/)
+    (values 'KEY_PAIR_END #t #f #f)]
+   [else
+    (values 'KEY_READING #t #f #t)]))

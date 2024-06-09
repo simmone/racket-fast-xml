@@ -57,8 +57,24 @@
             (let* ([key (if (> (length keys) 1)
                             (string-join (reverse keys) ".")
                             (car keys))])
+
+              (when (hash-has-key? attr_def_hash key)
+                (hash-for-each
+                 (hash-ref attr_def_hash key)
+                 (lambda (k v)
+                   (let ([attr_setted
+                          (if attr_hash
+                              (if (hash-has-key? attr_hash k)
+                                  (hash-ref attr_hash k)
+                                  #f)
+                              #f)])
+                     (when (not attr_setted)
+                         (hash-set! xml_hash k `(,@(hash-ref xml_hash k '()) "")))))))
+
               (when (hash-has-key? attr_def_hash key)
                 (set! attr_hash (hash-copy (hash-ref attr_def_hash key)))))
+
+            (set! attr_hash #f)
 
             (key-end ch)]
            [(eq? status 'KEY_READING_END)
@@ -78,25 +94,11 @@
             (let* ([key (if (> (length keys) 1)
                             (string-join (reverse keys) ".")
                             (car keys))])
-
-              (if attr_hash
-                (hash-for-each
-                 attr_hash
-                 (lambda (k v)
-                   (when (not v)
-                   (hash-set! xml_hash k `(,@(hash-ref xml_hash k '()) "")))))
-                (when (hash-has-key? attr_def_hash key)
-                  (hash-for-each
-                   (hash-ref attr_def_hash key)
-                   (lambda (k v)
-                     (hash-set! xml_hash k `(,@(hash-ref xml_hash k '()) ""))))))
-
               (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v) (not key_value_obtained))
                 (hash-set! xml_hash key `(,@(hash-ref xml_hash key '()) ""))))
 
             (set! keys (cdr keys))
             (set! key_value_obtained #f)
-            (set! attr_hash #f)
             (values 'KEY_START #t #f #f)]
            [(eq? status 'ATTR_KEY_END)
             (let ([key (string-join (reverse keys) ".")])
@@ -122,7 +124,7 @@
               (set! key_value_obtained #t))
 
             (set! waiting_key #f)
-            (values 'KEY_START #f #f #f)]
+            (values 'KEY_END #f #f #f)]
            ))
 
         (loop
