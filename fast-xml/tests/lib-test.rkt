@@ -106,6 +106,18 @@
                    "h1.h2.h3.content"))
       )
     )
+
+   (test-case
+    "test-from-special-chars"
+    
+    (check-equal? (from-special-chars "1&lt;2") "1<2")
+    (check-equal? (from-special-chars "1&gt;2") "1>2")
+    (check-equal? (from-special-chars "1&amp;2") "1&2")
+    (check-equal? (from-special-chars "1&apos;2") "1'2")
+    (check-equal? (from-special-chars "1&quot;2") "1\"2")
+
+    (check-equal? (from-special-chars "1&quot;&quot;2&lt;3&gt;4&amp;5&apos;6") "1\"\"2<3>4&5'6")
+    )
   ))
 
 (run-tests test-lib)

@@ -113,7 +113,9 @@
             (values 'ATTR_VALUE_READING #t #f #f)]
            [(eq? status 'ATTR_VALUE_END)
             (when (and waiting_key (hash-has-key? def_hash waiting_key) (eq? (hash-ref def_hash waiting_key) 'a))
-              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(list->string (reverse (cdr chars)))))
+              (hash-set! xml_hash waiting_key
+                         `(,@(hash-ref xml_hash waiting_key '())
+                           ,(from-special-chars (list->string (reverse (cdr chars))))))
               (hash-set! attr_hash waiting_key #t))
 
             (let ([key (string-join (reverse keys) ".")])
@@ -124,7 +126,9 @@
             (attr-value-end ch)]
            [(eq? status 'KEY_VALUE_END)
             (when waiting_key
-              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(list->string (reverse (cdr chars)))))
+              (hash-set! xml_hash waiting_key
+                         `(,@(hash-ref xml_hash waiting_key '())
+                           ,(from-special-chars (list->string (reverse (cdr chars))))))
               (set! key_value_obtained #t))
 
             (set! waiting_key #f)

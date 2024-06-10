@@ -2,6 +2,7 @@
 
 (provide (contract-out
           [defs-to-hash (-> (listof (cons/c string? (or/c 'v 'a))) (values hash? hash?))]
+          [from-special-chars (-> string? string?)]
           [STATUS? (-> symbol? boolean?)]
           ))
 
@@ -28,6 +29,17 @@
                    )))
       #f
       #t))
+
+(define (from-special-chars str)
+  (regexp-replaces
+   str
+   '(
+     [#rx"&quot;" "\""]
+     [#rx"&apos;" "'"]
+     [#rx"&amp;" "\\&"]
+     [#rx"&gt;" ">"]
+     [#rx"&lt;" "<"]
+     )))
 
 (define (defs-to-hash def_list)
   (let ([def_hash (make-hash)]
