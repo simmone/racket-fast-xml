@@ -45,6 +45,10 @@
                        ("worksheet.sheetData.row" . v)
                        ("worksheet.sheetData.row.r" . a)
                        ("worksheet.sheetData.row.spans" . a)
+                       ("worksheet.sheetData.row.c" . v)
+                       ("worksheet.sheetData.row.c.r" . a)
+                       ("worksheet.sheetData.row.c.t" . a)
+                       ("worksheet.sheetData.row.c.v" . v)
                        )
 
       (check-equal? (hash-ref xml_hash "worksheet'") '(""))
@@ -84,103 +88,24 @@
 
       (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.r") '("1" "2" "3" "4"))
       (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.spans") '("1:6" "1:6" "1:6" "1:6"))
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c's count") 6)
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c.r") "A")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c.t") "s")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c.v") "6")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c2.r") "B")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c2.t") "s")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c2.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c2.v") "")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c3.r") "C")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c3.t") "s")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c3.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c3.v") "2")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c4.r") "D")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c4.t") "s")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c4.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c4.v") "3")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c5.r") "E")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c5.t") "s")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c5.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c5.v") "4")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c6.r") "F")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c6.t") "s")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c6.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c6.v") "5")
-
-      ;; 73
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.r") "2")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.spans") ":6")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c's count") 6)
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c.r") "A2")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c.t") "s")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c.v") "8")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c2.r") "B2")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c2.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c2.v") "00")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c3.r") "C2")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c3.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c3.v") "300")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c4.r") "D2")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c4.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c4.v") "200")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c5.r") "E2")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c5.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c5.v") "0.6934")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c6.r") "F2")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c6.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row2.c6.v") "43360")
-
-      ;; 95
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.r") "3")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.spans") ":6")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c's count") 6)
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c.r") "A3")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c.t") "s")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c.v") "3")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c2.r") "B3")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c2.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c2.v") "200")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c3.r") "C3")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c3.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c3.v") "400")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c4.r") "D3")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c4.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c4.v") "300")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c5.r") "E3")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c5.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c5.v") "39999.89223")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c6.r") "F3")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c6.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row3.c6.v") "4336")
-
-      ;; 7
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.r") "4")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.spans") ":6")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c's count") 6)
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c.r") "A4")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c.t") "s")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c.v") "6")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c2.r") "B4")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c2.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c2.v") "300")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c3.r") "C4")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c3.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c3.v") "500")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c4.r") "D4")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c4.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c4.v") "400")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c5.r") "E4")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c5.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c5.v") "23.34")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c6.r") "F4")
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c6.v's count") )
-      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row4.c6.v") "43362")
+      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c") '("" "" "" ""))
+      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c.r") '("A1" "B1" "C1" "D1" "E1" "F1"
+                                                                        "A2" "B2" "C2" "D2" "E2" "F2"
+                                                                        "A3" "B3" "C3" "D3" "E3" "F3"
+                                                                        "A4" "B4" "C4" "D4" "E4" "F4"
+                                                                        ))
+      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c.t") '(
+                                                                        "s" "s" "s" "s" "s" "s"
+                                                                        "s" ""  ""  ""  ""  ""
+                                                                        "s" ""  ""  ""  ""  ""
+                                                                        "s" ""  ""  ""  ""  ""
+                                                                        )
+      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c.v") '(
+                                                                        "6" "1" "2" "3" "4" "5"
+                                                                        "8" "100" "300" "200" "0.6934" "43360"
+                                                                        "13" "200" "400" "300" "139999.89223" "43361"
+                                                                        "6" "300" "500" "400" "23.34" "43362"
+                                                                        )
 
       ;; 39
       (check-equal? (hash-ref xml_hash "worksheet.phoneticPr's count") )
