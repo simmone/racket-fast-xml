@@ -158,13 +158,16 @@
            (xml-file-to-hash
             data_xml_file
             '(
-              ("h1.h2.topic" . v)
+              ("sheetData.row.c.t" . a)
               )
             stderr_port
             (current-output-port)
             )])
 
-      (check-equal? (hash-count xml_hash) 1)
-      
-      (check-equal? (hash-ref xml_hash "h1.h2.topic") '(" cx "))
+      (check-equal? (hash-ref xml_hash "sheetData.row.c.t") '(
+                                                                        "s" "s" "s" "s" "s" "s"
+                                                                        "s" ""  ""  ""  ""  ""
+                                                                        "s" ""  ""  ""  ""  ""
+                                                                        "s" ""  ""  ""  ""  ""
+                                                                        ))
 ))))
