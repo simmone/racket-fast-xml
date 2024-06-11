@@ -118,6 +118,18 @@
 
     (check-equal? (from-special-chars "1&quot;&quot;2&lt;3&gt;4&amp;5&apos;6") "1\"\"2<3>4&5'6")
     )
+
+   (test-case
+    "test-to-special-chars"
+    
+    (check-equal? (to-special-chars "1<2") "1&lt;2")
+    (check-equal? (to-special-chars "1>2") "1&gt;2")
+    (check-equal? (to-special-chars "1&2") "1&amp;2")
+    (check-equal? (to-special-chars "1'2") "1&apos;2")
+    (check-equal? (to-special-chars "1\"2") "1&quot;2")
+
+    (check-equal? (to-special-chars "1\"\"2<3>4&5'6") "1&quot;&quot;2&lt;3&gt;4&amp;5&apos;6"))
+
   ))
 
 (run-tests test-lib)
