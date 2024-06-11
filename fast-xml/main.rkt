@@ -174,7 +174,7 @@
                      (lambda (property_port)
                        (let loop-properties ([properties (filter (cons/c (or/c string? symbol?) (or/c string? symbol?)) (cdr nodes))])
                          (when (not (null? properties))
-                           (fprintf property_port" ~a=\"~a\"" (caar properties) (cdar properties))
+                           (fprintf property_port" ~a=\"~a\"" (caar properties) (to-special-chars (cdar properties)))
                            (loop-properties (cdr properties)))))))
 
            (if (null? children)
@@ -182,14 +182,14 @@
                (begin
                  (fprintf out_p ">")
                  (if (not (null? value_children))
-                     (fprintf out_p "~a</~a>\n" (apply string-append (map (lambda (v) (format "~a" v)) value_children)) (car nodes))
+                     (fprintf out_p "~a</~a>\n" (to-special-chars (apply string-append (map (lambda (v) (format "~a" v)) value_children))) (car nodes))
                      (fprintf out_p "\n~a~a</~a>\n"
-                              (call-with-output-string
-                               (lambda (children_port)
-                                 (let loop-children ([children list_children])
-                                   (when (not (null? children))
-                                     (loop children_port (car children) (string-append prefix_spaces "  "))
-                                     (loop-children (cdr children))))))
+                               (call-with-output-string
+                                (lambda (children_port)
+                                  (let loop-children ([children list_children])
+                                    (when (not (null? children))
+                                      (loop children_port (car children) (string-append prefix_spaces "  "))
+                                      (loop-children (cdr children))))))
                               prefix_spaces
                               (car nodes)))))))))))
 
