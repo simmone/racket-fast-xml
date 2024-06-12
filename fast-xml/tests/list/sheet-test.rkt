@@ -20,7 +20,6 @@
                      '(
                        ("worksheet.xmlns" . a)
                        ("worksheet.xmlns:r" . a)
-                       ("worksheet.dimension" . v)
                        ("worksheet.dimension.ref" . a)
                        ("worksheet.sheetViews.sheetView.selection" . v)
                        ("worksheet.sheetViews.sheetView.selection.pane" . a)
@@ -31,9 +30,7 @@
                        ("worksheet.sheetViews.sheetView.pane.topLeftCell" . a)
                        ("worksheet.sheetViews.sheetView.pane.activePane" . a)
                        ("worksheet.sheetViews.sheetView.pane.state" . a)
-                       ("worksheet.sheetFormatPr" . v)
                        ("worksheet.sheetFormatPr.defaultRowHeight" . a)
-                       ("worksheet.cols.col" . v)
                        ("worksheet.cols.col.min" . a)
                        ("worksheet.cols.col.max" . a)
                        ("worksheet.cols.col.width" . a)
@@ -63,7 +60,6 @@
       (check-equal? (hash-ref xml_hash "worksheet.xmlns") '("http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
       (check-equal? (hash-ref xml_hash "worksheet.xmlns:r") '("http://schemas.openxmlformats.org/officeDocument/2006/relationships"))
 
-      (check-equal? (hash-ref xml_hash "worksheet.dimension") '(""))
       (check-equal? (hash-ref xml_hash "worksheet.dimension.ref") '("A1:F4"))
 
       (check-equal? (hash-ref xml_hash "worksheet.sheetViews.sheetView.selection") '("" "" ""))
@@ -77,12 +73,8 @@
       (check-equal? (hash-ref xml_hash "worksheet.sheetViews.sheetView.pane.activePane") '("bottomRight"))
       (check-equal? (hash-ref xml_hash "worksheet.sheetViews.sheetView.pane.state") '("frozen"))
 
-      (check-equal? (hash-ref xml_hash "worksheet.sheetFormatPr") '(""))
       (check-equal? (hash-ref xml_hash "worksheet.sheetFormatPr.defaultRowHeight") '("13.5"))
 
-      (check-equal? (hash-ref xml_hash "worksheet.cols.col") '("" "" "" ""))
-
-      (check-equal? (hash-ref xml_hash "worksheet.cols.col") '("" "" "" ""))
       (check-equal? (hash-ref xml_hash "worksheet.cols.col.min") '("1" "3" "5" "6"))
       (check-equal? (hash-ref xml_hash "worksheet.cols.col.max") '("2" "4" "5" "6"))
       (check-equal? (hash-ref xml_hash "worksheet.cols.col.width") '("50" "8" "14" "8"))

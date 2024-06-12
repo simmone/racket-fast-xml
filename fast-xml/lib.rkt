@@ -3,7 +3,7 @@
 (provide (contract-out
           [defs-to-hash (-> (listof (cons/c string? (or/c 'v 'a))) (values hash? hash?))]
           [from-special-chars (-> string? string?)]
-          [to-special-chars (-> string? string?)]
+          [to-special-chars (-> (or/c string? symbol?) string?)]
           [STATUS? (-> symbol? boolean?)]
           ))
 
@@ -44,7 +44,7 @@
 
 (define (to-special-chars str)
   (regexp-replaces
-   str
+   (if (symbol? str) (symbol->string str) str)
    '(
      [#rx"\\&" "\\&amp;"]
      [#rx">" "\\&gt;"]

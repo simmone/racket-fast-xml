@@ -31,6 +31,8 @@
                        ("workbook.bookViews.workbookView.windowHeight" . a)
                        ("workbook.calcPr.calcId" . a)
                        ("workbook.sheets.sheet.name" . a)
+                       ("workbook.sheets.sheet.sheetId" . a)
+                       ("workbook.sheets.sheet.r:id" . a)
                        ))])
       (check-equal? (hash-ref xml_hash "workbook.xmlns") '("http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
       (check-equal? (hash-ref xml_hash "workbook.xmlns:r") '("http://schemas.openxmlformats.org/officeDocument/2006/relationships"))

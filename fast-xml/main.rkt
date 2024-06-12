@@ -5,6 +5,7 @@
           [xml-port-to-hash (-> input-port? (listof (cons/c string? (or/c 'v 'a))) hash?)]
           [lists-to-xml (-> list? string?)]
           [lists-to-compact_xml (-> list? string?)]
+          [lists-to-xml_content (-> list? string?)]
           ))
 
 (require "lib.rkt"
