@@ -18,13 +18,10 @@
     (let ([xml_hash (xml-file-to-hash
                      sheet_xml_file
                      '(
-                       ("worksheet" . v)
                        ("worksheet.xmlns" . a)
                        ("worksheet.xmlns:r" . a)
                        ("worksheet.dimension" . v)
                        ("worksheet.dimension.ref" . a)
-                       ("worksheet.sheetViews" . v)
-                       ("worksheet.sheetViews.sheetView" . v)
                        ("worksheet.sheetViews.sheetView.selection" . v)
                        ("worksheet.sheetViews.sheetView.selection.pane" . a)
                        ("worksheet.sheetViews.sheetView.workbookViewId" . a)
@@ -36,16 +33,12 @@
                        ("worksheet.sheetViews.sheetView.pane.state" . a)
                        ("worksheet.sheetFormatPr" . v)
                        ("worksheet.sheetFormatPr.defaultRowHeight" . a)
-                       ("worksheet.cols" . v)
                        ("worksheet.cols.col" . v)
                        ("worksheet.cols.col.min" . a)
                        ("worksheet.cols.col.max" . a)
                        ("worksheet.cols.col.width" . a)
-                       ("worksheet.sheetData" . v)
-                       ("worksheet.sheetData.row" . v)
                        ("worksheet.sheetData.row.r" . a)
                        ("worksheet.sheetData.row.spans" . a)
-                       ("worksheet.sheetData.row.c" . v)
                        ("worksheet.sheetData.row.c.r" . a)
                        ("worksheet.sheetData.row.c.t" . a)
                        ("worksheet.sheetData.row.c.v" . v)
@@ -67,15 +60,11 @@
                        ("worksheet.pageSetup.r:id" . a)
                        ))])
 
-;      (check-equal? (hash-ref xml_hash "worksheet") '(""))
       (check-equal? (hash-ref xml_hash "worksheet.xmlns") '("http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
       (check-equal? (hash-ref xml_hash "worksheet.xmlns:r") '("http://schemas.openxmlformats.org/officeDocument/2006/relationships"))
 
       (check-equal? (hash-ref xml_hash "worksheet.dimension") '(""))
       (check-equal? (hash-ref xml_hash "worksheet.dimension.ref") '("A1:F4"))
-
-;      (check-equal? (hash-ref xml_hash "worksheet.sheetViews") '(""))
-;      (check-equal? (hash-ref xml_hash "worksheet.sheetViews.sheetView") '(""))
 
       (check-equal? (hash-ref xml_hash "worksheet.sheetViews.sheetView.selection") '("" "" ""))
       (check-equal? (hash-ref xml_hash "worksheet.sheetViews.sheetView.selection.pane") '("bottomLeft" "topRight" "bottomRight"))
@@ -91,7 +80,6 @@
       (check-equal? (hash-ref xml_hash "worksheet.sheetFormatPr") '(""))
       (check-equal? (hash-ref xml_hash "worksheet.sheetFormatPr.defaultRowHeight") '("13.5"))
 
-;      (check-equal? (hash-ref xml_hash "worksheet.cols") '(""))
       (check-equal? (hash-ref xml_hash "worksheet.cols.col") '("" "" "" ""))
 
       (check-equal? (hash-ref xml_hash "worksheet.cols.col") '("" "" "" ""))
@@ -99,12 +87,9 @@
       (check-equal? (hash-ref xml_hash "worksheet.cols.col.max") '("2" "4" "5" "6"))
       (check-equal? (hash-ref xml_hash "worksheet.cols.col.width") '("50" "8" "14" "8"))
 
-;      (check-equal? (hash-ref xml_hash "worksheet.sheetData") '(""))
-;      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row") '("" "" "" ""))
-
       (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.r") '("1" "2" "3" "4"))
       (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.spans") '("1:6" "1:6" "1:6" "1:6"))
-;      (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c") '("" "" "" ""))
+
       (check-equal? (hash-ref xml_hash "worksheet.sheetData.row.c.r") '("A1" "B1" "C1" "D1" "E1" "F1"
                                                                         "A2" "B2" "C2" "D2" "E2" "F2"
                                                                         "A3" "B3" "C3" "D3" "E3" "F3"
