@@ -17,12 +17,14 @@ raco pkg install fast-xml
 @section{xml-to-hash}
 
 @codeblock{
-  (xml-to-hash (or/c path-string? (listof string?) input-port?)) -> hash?
+  (xml-file-to-hash (-> path-string? (listof (cons/c string? (or/c 'v 'a))) hash?))
 }
 
 @itemlist[
   @item{Load xml to hash map.}
-  @item{Use hierachy to access all the nodes's attribute and content: '("list.a.element" "list.a.attribute")}
+  @item{Use hierachy to access all the nodes's attribute and content, each item is a pair, cons hierachy 'a or 'v.
+        'a means this item is a attribute, 'v means this item is a value.
+        '(("list.a.element" . v) ("list.a.attribute" . a))}
   @item{Result is a list of string.}
 ]
 
@@ -30,15 +32,14 @@ raco pkg install fast-xml
 
 xml:
 @codeblock{
-<empty attr1="a1" attr2="a2">
-</empty>
+<empty attr1="a1" attr2="a2">v</empty>
 }
 
 xml-to-hash:
 @codeblock{
 (let ([xml_hash (xml-file-to-hash
                  empty2_xml_file
-                 '("empty" "empty.attr1" "empty.attr2")
+                 '(("empty" "empty.attr1" . a) ("empty.attr2" . a))
                 )])
   (printf "xml hash has ~a keys.\n" (hash-count xml_hash))
 
@@ -50,12 +51,12 @@ xml-to-hash:
 )
 
 xml hash has 3 keys.
-empty: '("")
-empty.attr1: '("a1")
-empty.attr2: '("a2")
+empty: (v)
+empty.attr1: (a1)
+empty.attr2: (a2)
 }
 
-Be careful, if xml is below style, then node "empty" can't get value.
+Be careful, if xml is below style, then node "empty"'s value is "".
 @codeblock{
 <empty attr1="a1" attr2="a2"/>
 }
@@ -78,15 +79,14 @@ xml:
 
 xml-to-hash:
 @codeblock{
-(let ([xml_hash (xml-to-hash "hierachy.xml")])
-  ;; if each node is the unique, so each node must append serial "1" at the end.
-  (printf "level11.level21.level31.attr: [~a]\n" (hash-ref xml_hash "level11.level21.level31.attr"))
+(let ([xml_hash (xml-to-hash "hierachy.xml" '(("level1.level2.level3.attr" . a) ("level1.level2.level3.level4" . v)))])
+  (printf "level1.level2.level3.attr: [~a]\n" (hash-ref xml_hash "level1.level2.level3.attr"))
 
-  (printf "level11.level21.level31.level41: [~a]\n" (hash-ref xml_hash "level11.level21.level31.level41"))
+  (printf "level1.level2.level3.level4: [~a]\n" (hash-ref xml_hash "level1.level2.level3.level4"))
 )
 
-level11.level21.level31.attr: [a3]
-level11.level21.level31.level41: [Hello Xml!]
+level1.level2.level3.attr: [(a3)]
+level1.level2.level3.level4: [(Hello Xml!)]
 }
 
 @subsection{Count and List}
