@@ -77,9 +77,8 @@ xml:
 </level1>
 }
 
-xml-to-hash:
 @codeblock{
-(let ([xml_hash (xml-to-hash "hierachy.xml" '(("level1.level2.level3.attr" . a) ("level1.level2.level3.level4" . v)))])
+(let ([xml_hash (xml-file-to-hash "hierachy.xml" '(("level1.level2.level3.attr" . a) ("level1.level2.level3.level4" . v)))])
   (printf "level1.level2.level3.attr: [~a]\n" (hash-ref xml_hash "level1.level2.level3.attr"))
 
   (printf "level1.level2.level3.level4: [~a]\n" (hash-ref xml_hash "level1.level2.level3.level4"))
@@ -89,69 +88,31 @@ level1.level2.level3.attr: [(a3)]
 level1.level2.level3.level4: [(Hello Xml!)]
 }
 
-@subsection{Count and List}
+@subsection{Default Attribute}
 
-XML's node can occur once or more than once. So xml-to-hash count all the node.
-In result hash, you can get all node's occurence count.
-
-How? Use "'s count" suffix.
+If some node has no some attribute, then it get a default "" value.
 
 xml:
 @codeblock{
 <list>
   <child attr="a1">c1</child>
-  <child attr="a2">c2</child>
+  <child>c2</child>
   <child attr="a3">c3</child>
 </list>
 }
 
-xml-to-hash:
 @codeblock{
-(let ([xml_hash (xml-to-hash "list.xml")])
-  (printf "xml hash has ~a pairs.\n" (hash-count xml_hash))
+(let ([xml_hash (xml-file-to-hash
+                 "default.xml"
+                 '(
+                   ("list.child.attr" . a)
+                   ))])
 
-  (printf "list's count: [~a]\n" (hash-ref xml_hash "list's count"))
+  (printf "list.child.attr: [~a]\n" (hash-ref xml_hash "list.child.attr"))
+)
 
-  (printf "list1.child's count: [~a]\n" (hash-ref xml_hash "list1.child's count"))
+list.child.attr: [(a1  a3)]
 
-  (printf "list1.child1's content: [~a]\n" (hash-ref xml_hash "list1.child1"))
-  (printf "list1.child1.attr: [~a]\n" (hash-ref xml_hash "list1.child1.attr"))
-
-  (printf "list1.child2's content: [~a]\n" (hash-ref xml_hash "list1.child2"))
-  (printf "list1.child2.attr: [~a]\n" (hash-ref xml_hash "list1.child2.attr"))
-
-  (printf "list1.child3's content: [~a]\n" (hash-ref xml_hash "list1.child3"))
-  (printf "list1.child3.attr: [~a]\n" (hash-ref xml_hash "list1.child3.attr")))
-
-xml hash has 8 pairs.
-list's count: [1]
-list1.child's count: [3]
-list1.child1's content: [c1]
-list1.child1.attr: [a1]
-list1.child2's content: [c2]
-list1.child2.attr: [a2]
-list1.child3's content: [c3]
-list1.child3.attr: [a3]
-}
-
-In above example, you can use "'s count" suffix to get each node's occurences.
-
-Append serial maybe let the code not so readable, but the benefit is we can use loop to traverse all node list.
-
-By node count and node appended serial.
-
-@codeblock{
-  (let loop ([index 1])
-    (when (<= index (hash-ref xml_hash "list1.child's count"))
-      (printf "child[~a]'s attr:[~a] and content:[~a]\n"
-              index
-              (hash-ref xml_hash (format "list1.child~a.attr" index))
-              (hash-ref xml_hash (format "list1.child~a" index)))
-      (loop (add1 index))))
-
-child[1]'s attr:[a1] and content:[c1]
-child[2]'s attr:[a2] and content:[c2]
-child[3]'s attr:[a3] and content:[c3]
 }
 
 @section{lists-to-xml}
@@ -199,10 +160,6 @@ remove all the format characters.
    '("H1" ("H2" "haha")) -> <H1><H2>haha</H2></H1>
 }
 
-@section{lists-to-xml_content and xml-trim}
+@section{lists-to-xml_content}
 
 lists-to-xml_content turn lists to xml without header.
-
-xml-trim to generate compact xml.
-
-these two function be combined together to generate the main functions.
