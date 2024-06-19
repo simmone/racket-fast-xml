@@ -23,13 +23,23 @@
               ("worksheet.cols.col.collapsed" . a)
               ))])
 
-      (check-equal? (hash-count xml_hash) 3)
+      (check-equal? (hash-count xml_hash) 7)
 
-      (check-equal? (hash-ref xml_hash "worksheet.xmlns") '("http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
+      (check-equal? (hash-ref xml_hash "worksheet's count") 1)
 
-      (check-equal? (hash-ref xml_hash "worksheet.cols.test") '("2"))
+      (check-equal? (hash-ref xml_hash "worksheet.xmlns's count") 1)
 
-      (check-equal? (hash-ref xml_hash "worksheet.cols.col.collapsed") '("1" "2" ""))
+      (check-equal? (hash-ref xml_hash "worksheet.xmlns.cols's count") 1)
+
+      (check-equal? (hash-ref xml_hash "worksheet.xmlns.cols.col's count") 3)
+
+      (check-equal? (hash-ref xml_hash "worksheet1.xmlns") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
+
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.test") "2")
+
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col1.collapsed") "1")
+
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col2.collapsed") "2")
       ))
   ))
 
