@@ -86,11 +86,17 @@
            [(eq? status 'KEY_READING_END)
             (let* ([key (if (> (length keys) 1)
                             (string-join (reverse keys) ".")
-                            (car keys))])
-
-              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
-                (set! waiting_key key)
-                (set! key_value_obtained #f))
+                            (car keys))]
+                   [count_key (format "~a's count" key)])
+              
+              (when (hash-has-key? def_hash key)
+                (when (eq? (hash-ref def_hash key) 'v)
+                  (set! waiting_key key)
+                  (set! key_value_obtained #f))
+                
+                (when (eq? (hash-ref def_hash key) 'k)
+                  (printf "~a\n" count_key)
+                  (hash-set! xml_hash count_key (add1 (hash-ref xml_hash count_key 0)))))
 
               (when (hash-has-key? attr_def_hash key)
                 (set! attr_hash (hash-copy (hash-ref attr_def_hash key)))))
@@ -115,7 +121,9 @@
             (values 'ATTR_VALUE_READING #t #f #f)]
            [(eq? status 'ATTR_VALUE_END)
             (when (and waiting_key (hash-has-key? def_hash waiting_key) (eq? (hash-ref def_hash waiting_key) 'a))
-              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(list->string (reverse (cdr chars)))))
+              (hash-set! xml_hash waiting_key
+                         `(,@(hash-ref xml_hash waiting_key '())
+                           ,(from-special-chars (list->string (reverse (cdr chars))))))
               (hash-set! attr_hash waiting_key #t))
 
             (let ([key (string-join (reverse keys) ".")])
@@ -126,7 +134,9 @@
             (attr-value-end ch)]
            [(eq? status 'KEY_VALUE_END)
             (when waiting_key
-              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(list->string (reverse (cdr chars)))))
+              (hash-set! xml_hash waiting_key
+                         `(,@(hash-ref xml_hash waiting_key '())
+                           ,(from-special-chars (list->string (reverse (cdr chars))))))
               (set! key_value_obtained #t))
 
             (set! waiting_key #f)
@@ -158,16 +168,29 @@
            (xml-file-to-hash
             data_xml_file
             '(
-              ("sheetData.row.c.t" . a)
+              ("worksheet.xmlns" . a)
+              ("worksheet.cols.test" . a)
+              ("worksheet.cols.col.collapsed" . a)
               )
             stderr_port
             (current-output-port)
             )])
+      
+      (fprintf stderr_port "~a\n" xml_hash)
 
-      (check-equal? (hash-ref xml_hash "sheetData.row.c.t") '(
-                                                                        "s" "s" "s" "s" "s" "s"
-                                                                        "s" ""  ""  ""  ""  ""
-                                                                        "s" ""  ""  ""  ""  ""
-                                                                        "s" ""  ""  ""  ""  ""
-                                                                        ))
+      (check-equal? (hash-count xml_hash) 7)
+
+      (check-equal? (hash-ref xml_hash "worksheet's count") 1)
+
+      (check-equal? (hash-ref xml_hash "worksheet.xmlns.cols's count") 1)
+
+      (check-equal? (hash-ref xml_hash "worksheet.xmlns.cols.col's count") 3)
+
+      (check-equal? (hash-ref xml_hash "worksheet1.xmlns") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
+
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.test") "2")
+
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col1.collapsed") "1")
+
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col2.collapsed") "2")
 ))))
