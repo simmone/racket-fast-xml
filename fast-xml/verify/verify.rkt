@@ -38,8 +38,7 @@
                [count 0]
                [keys '()]
                [chars '()]
-               [waiting_key #f]
-               [key_value_obtained #f])
+               [waiting_key #f])
 
       (when (= (remainder count (* 1024 1024 1)) 0)
         (fprintf stderr_port "~aMk\n" (/ count (* 1024 1024 1))))
@@ -78,11 +77,9 @@
               
               (when (hash-has-key? def_hash key)
                 (when (eq? (hash-ref def_hash key) 'v)
-                  (set! waiting_key key)
-                  (set! key_value_obtained #f))
+                  (set! waiting_key key))
                 
                 (when (eq? (hash-ref def_hash key) 'k)
-                  (printf "~a\n" count_key)
                   (hash-set! xml_hash count_key (add1 (hash-ref xml_hash count_key 0))))))
 
             (key-reading-end ch)]
@@ -90,11 +87,10 @@
             (let* ([key (if (> (length keys) 1)
                             (string-join (reverse keys) ".")
                             (car keys))])
-              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v) (not key_value_obtained))
+              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
                 (hash-set! xml_hash key `(,@(hash-ref xml_hash key '()) ""))))
 
             (set! keys (cdr keys))
-            (set! key_value_obtained #f)
             (values 'KEY_WAITING #t #f #f)]
            [(eq? status 'ATTR_KEY_END)
             (let ([key (string-join (reverse keys) ".")])
@@ -119,14 +115,13 @@
             (when waiting_key
               (hash-set! xml_hash waiting_key
                          `(,@(hash-ref xml_hash waiting_key '())
-                           ,(from-special-chars (list->string (reverse (cdr chars))))))
-              (set! key_value_obtained #t))
+                           ,(from-special-chars (list->string (reverse (cdr chars)))))))
 
             (set! waiting_key #f)
             (values 'KEY_WAITING #f #f #f)]
            ))
 
-        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_key key_value_obtained)
+        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_key)
 
         (loop
          next_status
@@ -134,8 +129,7 @@
          (if read_char? (add1 count) count)
          (if reserve_key? (if (> (length chars) 0) (cons (list->string (reverse chars)) keys) keys) keys)
          (if reserve_char? (cons ch chars) '())
-         waiting_key
-         key_value_obtained)))
+         waiting_key)))
     xml_hash))
 
 (let ([stderr_port (current-error-port)])
@@ -143,8 +137,8 @@
       show_file
     #:exists 'replace
     (lambda ()
-      (printf "| Status | Char | Keys | Chars | Waiting Key| Key Value Obtained |\n")
-      (printf "|--------|------|------|-------|------------|--------------------|\n")
+      (printf "| Status | Char | Keys | Chars | Waiting Key|\n")
+      (printf "|--------|------|------|-------|------------|\n")
 
     (let ([xml_hash
            (xml-file-to-hash
