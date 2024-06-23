@@ -77,7 +77,7 @@
                 (when (eq? (hash-ref def_hash pure_key) 'v)
                   (set! waiting_pure_key pure_key)
                   (set! waiting_count_key count_key))
-                
+
                 (when (eq? (hash-ref def_hash pure_key) 'k)
                   (hash-set! xml_hash key_count (add1 (hash-ref xml_hash key_count 0))))))
 
@@ -88,7 +88,7 @@
            [(eq? status 'ATTR_KEY_END)
             (let* ([pure_key (from-keys-to-pure-key keys)]
                    [count_key (from-keys-to-count-key keys)])
-              (when (and (hash-has-key? def_hash pure_key) (eq? (hash-ref def_hash pure_key) 'a))
+              (when (and (hash-has-key? def_hash pure_key) (eq? (hash-ref def_hash pure_key) 'v))
                 (set! waiting_pure_key pure_key)
                 (set! waiting_count_key count_key)))
 
@@ -96,8 +96,11 @@
 
             (values 'ATTR_VALUE_READING #t #f #f)]
            [(eq? status 'ATTR_VALUE_END)
-            (when (and waiting_pure_key (hash-has-key? def_hash waiting_pure_key) (eq? (hash-ref def_hash waiting_pure_key) 'a))
+            (when (and waiting_pure_key (hash-has-key? def_hash waiting_pure_key) (eq? (hash-ref def_hash waiting_pure_key) 'v))
               (hash-set! xml_hash waiting_count_key (from-special-chars (list->string (reverse (cdr chars))))))
+
+            (set! waiting_pure_key #f)
+            (set! waiting_count_key #f)
 
             (attr-value-end ch)]
            [(eq? status 'KEY_VALUE_END)
@@ -117,10 +120,16 @@
          (if read_char? (read-char xml_port) ch)
          (if read_char? (add1 count) count)
          (if reserve_key?
-             (let ([key (list->string (reverse chars))])
-               (if (> (length chars) 0) (cons (cons key (hash-ref xml_hash (format "~a's count" key) 1)) keys)
+             (let* ([key (list->string (reverse chars))]
+                    [_keys (cons (cons key 0) keys)]
+                    [count_key (from-keys-to-count-key _keys)])
+
+               (printf "~a,~a\n" count_key (hash-ref xml_hash count_key 0))
+
+               (if (> (string-length key) 0)
+                   (cons (cons key (add1 (hash-ref xml_hash count_key 0))) keys)
                    keys))
-             keys)
+               keys)
          (if reserve_char? (cons ch chars) '())
          waiting_pure_key
          waiting_count_key)))
@@ -138,9 +147,9 @@
            (xml-file-to-hash
             data_xml_file
             '(
-              ("worksheet.xmlns" . a)
-              ("worksheet.cols.test" . a)
-              ("worksheet.cols.col.collapsed" . a)
+              "worksheet.xmlns"
+              "worksheet.cols.test"
+              "worksheet.cols.col.collapsed"
               )
             stderr_port
             (current-output-port)
@@ -148,19 +157,19 @@
       
       (fprintf stderr_port "~a\n" xml_hash)
 
-      (check-equal? (hash-ref xml_hash "worksheet's count") 1)
+      (check-equal? (hash-ref xml_hash "worksheet1's count") 1)
 
-      (check-equal? (hash-ref xml_hash "worksheet.cols's count") 1)
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1's count") 1)
 
-      (check-equal? (hash-ref xml_hash "worksheet.cols.col's count") 3)
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col's count") 3)
 
-      (check-equal? (hash-ref xml_hash "worksheet1.xmlns") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
+      (check-equal? (hash-ref xml_hash "worksheet1.xmlns1") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
 
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1.test") "2")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.test1") "2")
 
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col1.collapsed") "1")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col1.collapsed1") "1")
 
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col2.collapsed") "2")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col2.collapsed1") "2")
 
       (check-equal? (hash-count xml_hash) 7)
 ))))
