@@ -47,7 +47,8 @@
                [count 0]
                [keys '()]
                [chars '()]
-               [waiting_key #f])
+               [waiting_pure_key #f]
+               [waiting_count_key #f])
 
       (when (= (remainder count (* 1024 1024 1)) 0)
         (fprintf stderr_port "~aMk\n" (/ count (* 1024 1024 1))))
@@ -74,43 +75,42 @@
               
               (when (hash-has-key? def_hash pure_key)
                 (when (eq? (hash-ref def_hash pure_key) 'v)
-                  (set! waiting_key count_key))
+                  (set! waiting_pure_key pure_key)
+                  (set! waiting_count_key count_key))
                 
                 (when (eq? (hash-ref def_hash pure_key) 'k)
                   (hash-set! xml_hash key_count (add1 (hash-ref xml_hash key_count 0))))))
 
             (key-reading-end ch)]
            [(eq? status 'KEY_PAIR_END)
-            (let* ([pure_key (from-keys-to-pure-key keys)]
-                   [count_key (from-keys-to-count-key keys)])
-              (when (and (hash-has-key? def_hash pure_key) (eq? (hash-ref def_hash pure_key) 'v))
-                (hash-set! xml_hash key `(,@(hash-ref xml_hash key '()) ""))))
-
             (set! keys (cdr keys))
             (values 'KEY_WAITING #t #f #f)]
            [(eq? status 'ATTR_KEY_END)
-            (let ([key (string-join (reverse keys) ".")])
-              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'a))
-                (set! waiting_key key)))
+            (let* ([pure_key (from-keys-to-pure-key keys)]
+                   [count_key (from-keys-to-count-key keys)])
+              (when (and (hash-has-key? def_hash pure_key) (eq? (hash-ref def_hash pure_key) 'a))
+                (set! waiting_pure_key pure_key)
+                (set! waiting_count_key count_key)))
 
             (set! keys (cdr keys))
+
             (values 'ATTR_VALUE_READING #t #f #f)]
            [(eq? status 'ATTR_VALUE_END)
-            (when (and waiting_key (hash-has-key? def_hash waiting_key) (eq? (hash-ref def_hash waiting_key) 'a))
-              (hash-set! xml_hash waiting_key (from-special-chars (list->string (reverse (cdr chars))))))
+            (when (and waiting_pure_key (hash-has-key? def_hash waiting_pure_key) (eq? (hash-ref def_hash waiting_pure_key) 'a))
+              (hash-set! xml_hash waiting_count_key (from-special-chars (list->string (reverse (cdr chars))))))
 
             (attr-value-end ch)]
            [(eq? status 'KEY_VALUE_END)
-            (when waiting_key
-              (hash-set! xml_hash waiting_key
-                         `(,@(hash-ref xml_hash waiting_key '())
-                           ,(from-special-chars (list->string (reverse (cdr chars)))))))
+            (when waiting_pure_key
+              (hash-set! xml_hash waiting_count_key
+                         (from-special-chars (list->string (reverse (cdr chars))))))
 
-            (set! waiting_key #f)
+            (set! waiting_pure_key #f)
+            (set! waiting_count_key #f)
             (values 'KEY_WAITING #f #f #f)]
            ))
 
-        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_key)
+        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_pure_key waiting_count_key)
 
         (loop
          next_status
@@ -122,7 +122,8 @@
                    keys))
              keys)
          (if reserve_char? (cons ch chars) '())
-         waiting_key)))
+         waiting_pure_key
+         waiting_count_key)))
     xml_hash))
 
 (let ([stderr_port (current-error-port)])
@@ -130,8 +131,8 @@
       show_file
     #:exists 'replace
     (lambda ()
-      (printf "| Status | Char | Keys | Chars | Waiting Key|\n")
-      (printf "|--------|------|------|-------|------------|\n")
+      (printf "| Status | Char | Keys | Chars | Waiting Pure Key| Waiting Count Key |\n")
+      (printf "|--------|------|------|-------|-----------------|-------------------|\n")
 
     (let ([xml_hash
            (xml-file-to-hash
