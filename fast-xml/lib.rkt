@@ -1,7 +1,7 @@
 #lang racket
 
 (provide (contract-out
-          [defs-to-hash (-> (listof (cons/c string? (or/c 'v 'a))) (values hash? hash?))]
+          [defs-to-hash (-> (listof (cons/c string? (or/c 'v 'a))) hash?)]
           [from-special-chars (-> string? string?)]
           [to-special-chars (-> (or/c string? symbol?) string?)]
           [STATUS? (-> symbol? boolean?)]
@@ -54,8 +54,7 @@
      )))
 
 (define (defs-to-hash def_list)
-  (let ([def_hash (make-hash)]
-        [attr_hash (make-hash)])
+  (let ([def_hash (make-hash)])
     (let loop-def ([defs def_list])
       (when (not (null? defs))
 
@@ -71,13 +70,7 @@
 
                 (hash-set! def_hash key type)
                 
-                (when (eq? type 'a)
-                  (let* ([node (string-join (reverse last_keys) ".")]
-                         [default_hash (hash-ref attr_hash node (make-hash))])
-                    (hash-set! default_hash key #f)
-                    (hash-set! attr_hash node default_hash)))
-
                 (loop-items (cdr items) keys))))
           )
         (loop-def (cdr defs))))
-    (values def_hash attr_hash)))
+    def_hash))

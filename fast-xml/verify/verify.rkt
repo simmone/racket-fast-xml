@@ -39,11 +39,8 @@
         (car _keys))))
 
 (define (xml-port-to-hash xml_port def_list stderr_port out_port)
-  (let ([xml_hash (make-hash)])
-
-    (define-values
-        (def_hash attr_def_hash)
-      (defs-to-hash def_list))
+  (let ([xml_hash (make-hash)]
+        [def_hash (defs-to-hash def_list)])
 
     (let loop ([status 'TRAVERSE_START]
                [ch (read-char xml_port)]
@@ -69,15 +66,7 @@
            [(eq? status 'ATTR_KEY_READING) (attr-key-reading ch)]
            [(eq? status 'ATTR_VALUE_WAITING) (attr-value-waiting ch)]
            [(eq? status 'ATTR_VALUE_READING) (attr-value-reading ch)]
-           [(eq? status 'KEY_END)
-            (let* ([pure_key (from-keys-to-pure-key keys)])
-              (when (hash-has-key? attr_def_hash pure_key)
-                (hash-for-each
-                 (hash-ref attr_def_hash pure_key)
-                 (lambda (k v)
-                   (hash-set! xml_hash k '())))))
-
-            (key-end ch)]
+           [(eq? status 'KEY_END) (key-end ch)]
            [(eq? status 'KEY_READING_END)
             (let* ([pure_key (from-keys-to-pure-key keys)]
                    [count_key (from-keys-to-count-key keys)]
@@ -92,10 +81,9 @@
 
             (key-reading-end ch)]
            [(eq? status 'KEY_PAIR_END)
-            (let* ([key (if (> (length keys) 1)
-                            (string-join (reverse keys) ".")
-                            (car keys))])
-              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
+            (let* ([pure_key (from-keys-to-pure-key keys)]
+                   [count_key (from-keys-to-count-key keys)])
+              (when (and (hash-has-key? def_hash pure_key) (eq? (hash-ref def_hash pure_key) 'v))
                 (hash-set! xml_hash key `(,@(hash-ref xml_hash key '()) ""))))
 
             (set! keys (cdr keys))
