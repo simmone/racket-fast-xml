@@ -124,7 +124,7 @@
                     [_keys (cons (cons key 0) keys)]
                     [count_key (from-keys-to-count-key _keys)])
 
-               (printf "~a,~a\n" count_key (hash-ref xml_hash count_key 0))
+               (printf "~a,~a\n" count_key (add1 (hash-ref xml_hash count_key 0)))
 
                (if (> (string-length key) 0)
                    (cons (cons key (add1 (hash-ref xml_hash count_key 0))) keys)
@@ -157,19 +157,19 @@
       
       (fprintf stderr_port "~a\n" xml_hash)
 
-      (check-equal? (hash-ref xml_hash "worksheet1's count") 1)
+      (check-equal? (hash-ref xml_hash "worksheet's count") 1)
 
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1's count") 1)
+      (check-equal? (hash-ref xml_hash "worksheet1.cols's count") 1)
 
       (check-equal? (hash-ref xml_hash "worksheet1.cols1.col's count") 3)
 
-      (check-equal? (hash-ref xml_hash "worksheet1.xmlns1") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
+      (check-equal? (hash-ref xml_hash "worksheet1.xmlns") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
 
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1.test1") "2")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.test") "2")
 
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col1.collapsed1") "1")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col1.collapsed") "1")
 
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col2.collapsed1") "2")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col2.collapsed") "2")
 
       (check-equal? (hash-count xml_hash) 7)
 ))))
