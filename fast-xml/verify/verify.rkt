@@ -26,18 +26,6 @@
     (lambda ()
       (xml-port-to-hash (current-input-port) def_list stderr_port out_port))))
 
-(define (from-keys-to-pure-key keys)
-  (let* ([_keys (map car keys)])
-    (if (> (length _keys) 1)
-        (string-join (reverse _keys) ".")
-        (car _keys))))
-
-(define (from-keys-to-count-key keys)
-  (let* ([_keys (map (lambda (key_pair) (format "~a~a" (car key_pair) (cdr key_pair))) keys)])
-    (if (> (length _keys) 1)
-        (string-join (reverse _keys) ".")
-        (car _keys))))
-
 (define (xml-port-to-hash xml_port def_list stderr_port out_port)
   (let ([xml_hash (make-hash)]
         [def_hash (defs-to-hash def_list)])

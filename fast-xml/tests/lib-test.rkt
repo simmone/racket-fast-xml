@@ -94,7 +94,26 @@
     (check-equal? (to-special-chars "1\"2") "1&quot;2")
 
     (check-equal? (to-special-chars "1\"\"2<3>4&5'6") "1&quot;&quot;2&lt;3&gt;4&amp;5&apos;6"))
+   
+   (test-case
+    "test-from-keys-to-pure-key"
+    
+    (check-equal? (from-keys-to-pure-key '(("a" . 1))) "a")
 
+    (check-equal? (from-keys-to-pure-key '(("b" . 1) ("a" . 1))) "a.b")
+
+    (check-equal? (from-keys-to-pure-key '(("c" . 2) ("b" . 1) ("a" . 2))) "a.b.c")
+    )
+
+   (test-case
+    "test-from-keys-to-count-key"
+
+    (check-equal? (from-keys-to-count-key '(("a" . 1))) "a")
+
+    (check-equal? (from-keys-to-count-key '(("b" . 1) ("a" . 1))) "a1.b")
+
+    (check-equal? (from-keys-to-count-key '(("c" . 2) ("b" . 1) ("a" . 2))) "a2.b1.c")
+    )
   ))
 
 (run-tests test-lib)
