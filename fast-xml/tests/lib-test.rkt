@@ -103,6 +103,8 @@
     (check-equal? (from-keys-to-pure-key '(("b" . 1) ("a" . 1))) "a.b")
 
     (check-equal? (from-keys-to-pure-key '(("c" . 2) ("b" . 1) ("a" . 2))) "a.b.c")
+
+    (check-equal? (from-keys-to-pure-key '(("d" . 3) ("c" . 2) ("b" . 1) ("a" . 2))) "a.b.c.d")
     )
 
    (test-case
@@ -113,6 +115,8 @@
     (check-equal? (from-keys-to-count-key '(("b" . 1) ("a" . 1))) "a1.b")
 
     (check-equal? (from-keys-to-count-key '(("c" . 2) ("b" . 1) ("a" . 2))) "a2.b1.c")
+
+    (check-equal? (from-keys-to-count-key '(("d" . 3) ("c" . 2) ("b" . 1) ("a" . 2))) "a2.b1.c2.d")
     )
   ))
 

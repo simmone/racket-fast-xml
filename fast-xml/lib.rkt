@@ -78,13 +78,22 @@
     def_hash))
 
 (define (from-keys-to-pure-key keys)
-  (let* ([_keys (map car keys)])
+  (let ([_keys (map car keys)])
     (if (> (length _keys) 1)
         (string-join (reverse _keys) ".")
         (car _keys))))
 
 (define (from-keys-to-count-key keys)
-  (let* ([_keys (map (lambda (key_pair) (format "~a~a" (car key_pair) (cdr key_pair))) keys)])
-    (if (> (length _keys) 1)
-        (string-join (reverse _keys) ".")
-        (car _keys))))
+  (let loop ([_keys (reverse keys)]
+             [result_str ""])
+    (if (not (null? _keys))
+        (loop
+         (cdr _keys)
+         (format "~a~a"
+                 (if (string=? result_str "")
+                     ""
+                     (format "~a." result_str))
+                 (if (= (length _keys) 1)
+                     (caar _keys)
+                     (format "~a~a" (caar _keys) (cdar _keys)))))
+        result_str)))
