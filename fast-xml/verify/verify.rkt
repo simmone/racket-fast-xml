@@ -59,7 +59,7 @@
            [(eq? status 'KEY_READING_END)
             (let* ([pure_key (from-keys-to-pure-key keys)]
                    [count_key (from-keys-to-count-key keys)]
-                   [key_count (format "~a's count" pure_key)])
+                   [key_count (format "~a's count" count_key)])
               
               (when (hash-has-key? def_hash pure_key)
                 (when (eq? (hash-ref def_hash pure_key) 'v)
@@ -110,12 +110,13 @@
          (if reserve_key?
              (let* ([key (list->string (reverse chars))]
                     [_keys (cons (cons key 0) keys)]
-                    [count_key (from-keys-to-count-key _keys)])
+                    [count_key (from-keys-to-count-key _keys)]
+                    [key_count (format "~a's count" count_key)])
 
-               (printf "~a,~a\n" count_key (add1 (hash-ref xml_hash count_key 0)))
+               (printf "~a,~a\n" key_count (add1 (hash-ref xml_hash key_count 0)))
 
                (if (> (string-length key) 0)
-                   (cons (cons key (add1 (hash-ref xml_hash count_key 0))) keys)
+                   (cons (cons key (add1 (hash-ref xml_hash key_count 0))) keys)
                    keys))
                keys)
          (if reserve_char? (cons ch chars) '())
