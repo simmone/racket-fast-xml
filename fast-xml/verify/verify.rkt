@@ -30,6 +30,8 @@
   (let ([xml_hash (make-hash)]
         [def_hash (defs-to-hash def_list)])
 
+    (printf "~a\n" def_hash)
+
     (let loop ([status 'TRAVERSE_START]
                [ch (read-char xml_port)]
                [count 0]
@@ -135,30 +137,16 @@
     (let ([xml_hash
            (xml-file-to-hash
             data_xml_file
-            '(
-              "worksheet.xmlns"
-              "worksheet.cols.test"
-              "worksheet.cols.col.collapsed"
-              )
+            '("empty" "empty.attr1" "empty.attr2")
             stderr_port
             (current-output-port)
             )])
       
       (fprintf stderr_port "~a\n" xml_hash)
 
-      (check-equal? (hash-ref xml_hash "worksheet's count") 1)
-
-      (check-equal? (hash-ref xml_hash "worksheet1.cols's count") 1)
-
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col's count") 3)
-
-      (check-equal? (hash-ref xml_hash "worksheet1.xmlns") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
-
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1.test") "2")
-
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col1.collapsed") "1")
-
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col2.collapsed") "2")
-
-      (check-equal? (hash-count xml_hash) 7)
+      (check-equal? (hash-count xml_hash) 4)
+      (check-equal? (hash-ref xml_hash "empty's count") 1)
+      (check-equal? (hash-ref xml_hash "empty") "")
+      (check-equal? (hash-ref xml_hash "empty1.attr1") "a1")
+      (check-equal? (hash-ref xml_hash "empty1.attr2") "a2")
 ))))

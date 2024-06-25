@@ -59,19 +59,27 @@
   (let ([def_hash (make-hash)])
     (let loop-def ([defs def_list])
       (when (not (null? defs))
-
-        (hash-set! def_hash (car defs) 'v)
-
         (let ([def_items (regexp-split #rx"\\." (car defs))])
           (let loop-items ([items def_items]
                            [last_keys '()])
             (when (not (null? items))
               (let* ([keys (cons (car items) last_keys)]
                      [key (string-join (reverse keys) ".")]
-                     [type (hash-ref def_hash key 'k)])
+                     [type (hash-ref def_hash key #f)])
 
-                (hash-set! def_hash key type)
-                
+                (if (string=? (car defs) key)
+                    (if type
+                        (cond
+                         [(eq? type 'k)
+                          (hash-set! def_hash key 'kv)]
+                         [(eq? type 'v)
+                          (hash-set! def_hash key 'v)])
+                        (hash-set! def_hash key 'v))
+                    (if type
+                        (when (eq? type 'v)
+                          (hash-set! def_hash key 'kv))
+                        (hash-set! def_hash key 'k)))
+
                 (loop-items (cdr items) keys))))
           )
         (loop-def (cdr defs))))

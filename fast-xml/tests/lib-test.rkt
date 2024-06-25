@@ -56,7 +56,7 @@
       (check-equal? (hash-count def_hash) 4)
 
       (check-eq? (hash-ref def_hash "h1") 'k)
-      (check-eq? (hash-ref def_hash "h1.h2") 'v)
+      (check-eq? (hash-ref def_hash "h1.h2") 'kv)
       (check-eq? (hash-ref def_hash "h1.h2.h3") 'k)
       (check-eq? (hash-ref def_hash "h1.h2.h3.topic") 'v)
       )
@@ -65,10 +65,26 @@
       (check-equal? (hash-count def_hash) 5)
 
       (check-eq? (hash-ref def_hash "h1") 'k)
-      (check-eq? (hash-ref def_hash "h1.h2") 'v)
+      (check-eq? (hash-ref def_hash "h1.h2") 'kv)
       (check-eq? (hash-ref def_hash "h1.h2.h3") 'k)
       (check-eq? (hash-ref def_hash "h1.h2.h3.topic") 'v)
       (check-eq? (hash-ref def_hash "h1.h2.h3.content") 'v)
+      )
+
+    (let ([def_hash (defs-to-hash '("h" "h.a" "h.b"))])
+      (check-equal? (hash-count def_hash) 3)
+
+      (check-eq? (hash-ref def_hash "h") 'kv)
+      (check-eq? (hash-ref def_hash "h.a") 'v)
+      (check-eq? (hash-ref def_hash "h.b") 'v)
+      )
+
+    (let ([def_hash (defs-to-hash '("h.a" "h" "h.b"))])
+      (check-equal? (hash-count def_hash) 3)
+
+      (check-eq? (hash-ref def_hash "h") 'kv)
+      (check-eq? (hash-ref def_hash "h.a") 'v)
+      (check-eq? (hash-ref def_hash "h.b") 'v)
       )
     )
 
