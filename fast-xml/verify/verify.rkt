@@ -38,7 +38,7 @@
                [keys '()]
                [chars '()]
                [waiting_pure_key #f]
-               [waiting_count_key #f])
+               [waiting_value_key #f])
 
       (when (= (remainder count (* 1024 1024 1)) 0)
         (fprintf stderr_port "~aMk\n" (/ count (* 1024 1024 1))))
@@ -60,41 +60,56 @@
            [(eq? status 'KEY_END)
             (let* ([pure_key (from-keys-to-pure-key keys)]
                    [count_key (from-keys-to-count-key keys)]
-                   [key_count (format "~a's count" count_key)])
+                   [key_count (format "~a's count" count_key)]
+                   [value_key (from-keys-to-value-key keys)]
+                   )
               
               (when (hash-has-key? def_hash pure_key)
                 (let ([type (hash-ref def_hash pure_key)])
                   (when (or (eq? type 'v) (eq? type 'kv))
                     (set! waiting_pure_key pure_key)
-                    (set! waiting_count_key count_key)))))
+                    (set! waiting_value_key value_key)))))
 
             (key-end ch)]
            [(eq? status 'KEY_READING_END)
             (let* ([pure_key (from-keys-to-pure-key keys)]
                    [count_key (from-keys-to-count-key keys)]
-                   [key_count (format "~a's count" count_key)])
+                   [key_count (format "~a's count" count_key)]
+                   [value_key (from-keys-to-value-key keys)]
+                   )
               
               (when (hash-has-key? def_hash pure_key)
                 (let ([type (hash-ref def_hash pure_key)])
                   (when (or (eq? type 'v) (eq? type 'kv))
                     (set! waiting_pure_key pure_key)
-                    (set! waiting_count_key count_key))
+                    (set! waiting_value_key value_key))
 
                   (when (or (eq? type 'k) (eq? type 'kv))
                     (hash-set! xml_hash key_count (add1 (hash-ref xml_hash key_count 0)))))))
 
             (key-reading-end ch)]
            [(eq? status 'KEY_PAIR_END)
+            (when waiting_pure_key
+              (when (hash-has-key? def_hash waiting_pure_key)
+                (let ([type (hash-ref def_hash waiting_pure_key)])
+                  (when (or (eq? type 'v) (eq? type 'kv))
+                    (hash-set! xml_hash waiting_value_key (from-special-chars (list->string (reverse (cdr chars)))))))))
+
+            (set! waiting_pure_key #f)
+            (set! waiting_value_key #f)
+
             (set! keys (cdr keys))
             (values 'KEY_WAITING #t #f #f)]
            [(eq? status 'ATTR_KEY_END)
             (let* ([pure_key (from-keys-to-pure-key keys)]
-                   [count_key (from-keys-to-count-key keys)])
+                   [count_key (from-keys-to-count-key keys)]
+                   [value_key (from-keys-to-value-key keys)]
+                   )
               (when (hash-has-key? def_hash pure_key)
                 (let ([type (hash-ref def_hash pure_key)])
                   (when (or (eq? type 'v) (eq? type 'kv))
                     (set! waiting_pure_key pure_key)
-                    (set! waiting_count_key count_key)))))
+                    (set! waiting_value_key value_key)))))
 
             (set! keys (cdr keys))
 
@@ -104,23 +119,23 @@
               (when (hash-has-key? def_hash waiting_pure_key)
                 (let ([type (hash-ref def_hash waiting_pure_key)])
                   (when (or (eq? type 'v) (eq? type 'kv))
-                    (hash-set! xml_hash waiting_count_key (from-special-chars (list->string (reverse (cdr chars)))))))))
+                    (hash-set! xml_hash waiting_value_key (from-special-chars (list->string (reverse (cdr chars)))))))))
 
             (set! waiting_pure_key #f)
-            (set! waiting_count_key #f)
+            (set! waiting_value_key #f)
 
             (attr-value-end ch)]
            [(eq? status 'KEY_VALUE_END)
             (when waiting_pure_key
-              (hash-set! xml_hash waiting_count_key
+              (hash-set! xml_hash waiting_value_key
                          (from-special-chars (list->string (reverse (cdr chars))))))
 
             (set! waiting_pure_key #f)
-            (set! waiting_count_key #f)
+            (set! waiting_value_key #f)
             (values 'KEY_WAITING #f #f #f)]
            ))
 
-        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_pure_key waiting_count_key)
+        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_pure_key waiting_value_key)
 
         (loop
          next_status
@@ -132,15 +147,13 @@
                     [count_key (from-keys-to-count-key _keys)]
                     [key_count (format "~a's count" count_key)])
 
-               (printf "~a,~a\n" key_count (add1 (hash-ref xml_hash key_count 0)))
-
                (if (> (string-length key) 0)
                    (cons (cons key (add1 (hash-ref xml_hash key_count 0))) keys)
                    keys))
                keys)
          (if reserve_char? (cons ch chars) '())
          waiting_pure_key
-         waiting_count_key)))
+         waiting_value_key)))
     xml_hash))
 
 (let ([stderr_port (current-error-port)])
@@ -148,7 +161,7 @@
       show_file
     #:exists 'replace
     (lambda ()
-      (printf "| Status | Char | Keys | Chars | Waiting Pure Key| Waiting Count Key |\n")
+      (printf "| Status | Char | Keys | Chars | Waiting Pure Key| Waiting Value Key |\n")
       (printf "|--------|------|------|-------|-----------------|-------------------|\n")
 
     (let ([xml_hash
@@ -161,11 +174,15 @@
       
       (fprintf stderr_port "~a\n" xml_hash)
 
-      (check-equal? (hash-count xml_hash) 7)
-      (check-equal? (hash-ref xml_hash "data1.empty's count") 1)
-      (check-equal? (hash-ref xml_hash "data1.empty1") "")
+
+      (check-equal? (hash-ref xml_hash "data1.empty's count") 5)
+      (check-equal? (hash-ref xml_hash "data1.empty1") "1")
       (check-equal? (hash-ref xml_hash "data1.empty2") "3")
       (check-equal? (hash-ref xml_hash "data1.empty3") "")
+      (check-equal? (hash-ref xml_hash "data1.empty4") "4")
+      (check-equal? (hash-ref xml_hash "data1.empty5") "")
       (check-equal? (hash-ref xml_hash "data1.empty1.attr11") "a1")
       (check-equal? (hash-ref xml_hash "data1.empty1.attr21") "a2")
+
+      (check-equal? (hash-count xml_hash) 8)
 ))))
