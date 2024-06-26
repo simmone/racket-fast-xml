@@ -77,7 +77,7 @@
                    [key_count (format "~a's count" count_key)]
                    [value_key (from-keys-to-value-key keys)]
                    )
-              
+
               (when (hash-has-key? def_hash pure_key)
                 (let ([type (hash-ref def_hash pure_key)])
                   (when (or (eq? type 'v) (eq? type 'kv))
@@ -90,10 +90,10 @@
             (key-reading-end ch)]
            [(eq? status 'KEY_PAIR_END)
             (when waiting_pure_key
-              (when (hash-has-key? def_hash waiting_pure_key)
-                (let ([type (hash-ref def_hash waiting_pure_key)])
-                  (when (or (eq? type 'v) (eq? type 'kv))
-                    (hash-set! xml_hash waiting_value_key (from-special-chars (list->string (reverse (cdr chars)))))))))
+              (hash-set! xml_hash waiting_value_key
+                         (if (null? chars)
+                             ""
+                             (from-special-chars (list->string (reverse (cdr chars)))))))
 
             (set! waiting_pure_key #f)
             (set! waiting_value_key #f)
@@ -128,7 +128,9 @@
            [(eq? status 'KEY_VALUE_END)
             (when waiting_pure_key
               (hash-set! xml_hash waiting_value_key
-                         (from-special-chars (list->string (reverse (cdr chars))))))
+                         (if (null? chars)
+                             ""
+                             (from-special-chars (list->string (reverse (cdr chars)))))))
 
             (set! waiting_pure_key #f)
             (set! waiting_value_key #f)
@@ -174,7 +176,7 @@
       
       (fprintf stderr_port "~a\n" xml_hash)
 
-
+      (check-equal? (hash-ref xml_hash "data's count") 1)
       (check-equal? (hash-ref xml_hash "data1.empty's count") 5)
       (check-equal? (hash-ref xml_hash "data1.empty1") "1")
       (check-equal? (hash-ref xml_hash "data1.empty2") "3")
@@ -184,5 +186,5 @@
       (check-equal? (hash-ref xml_hash "data1.empty1.attr11") "a1")
       (check-equal? (hash-ref xml_hash "data1.empty1.attr21") "a2")
 
-      (check-equal? (hash-count xml_hash) 8)
+      (check-equal? (hash-count xml_hash) 9)
 ))))

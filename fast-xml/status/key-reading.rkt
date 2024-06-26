@@ -13,7 +13,7 @@
    [(char=? ch #\>)
     (values 'KEY_READING_END #f #t #f)]
    [(char=? ch #\/)
-    (values 'KEY_END #f #t #f)]
+    (values 'KEY_READING_END #f #t #f)]
    [else
     (values 'KEY_READING #t #f #t)]
    ))

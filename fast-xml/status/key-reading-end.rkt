@@ -9,7 +9,7 @@
 (define (key-reading-end ch)
   (cond
    [(char=? ch #\/)
-    (values 'KEY_PAIR_END #f #t #f)]
+    (values 'KEY_VALUE_END #f #f #f)]
    [(char=? ch #\>)
     (values 'KEY_END #t #t #f)]
    [else
