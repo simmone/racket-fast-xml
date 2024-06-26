@@ -6,6 +6,7 @@
           [to-special-chars (-> (or/c string? symbol?) string?)]
           [STATUS? (-> symbol? boolean?)]
           [from-keys-to-pure-key (-> (listof (cons/c string? natural?)) string?)]
+          [from-keys-to-value-key (-> (listof (cons/c string? natural?)) string?)]
           [from-keys-to-count-key (-> (listof (cons/c string? natural?)) string?)]
           ))
 
@@ -84,6 +85,12 @@
           )
         (loop-def (cdr defs))))
     def_hash))
+
+(define (from-keys-to-value-key keys)
+  (let ([_keys (map (lambda (k) (format "~a~a" (car k) (cdr k))) keys)])
+    (if (> (length _keys) 1)
+        (string-join (reverse _keys) ".")
+        (car _keys))))
 
 (define (from-keys-to-pure-key keys)
   (let ([_keys (map car keys)])

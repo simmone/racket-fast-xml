@@ -134,6 +134,19 @@
 
     (check-equal? (from-keys-to-count-key '(("d" . 3) ("c" . 2) ("b" . 1) ("a" . 2))) "a2.b1.c2.d")
     )
+
+   (test-case
+    "test-from-keys-to-value-key"
+
+    (check-equal? (from-keys-to-value-key '(("a" . 1))) "a1")
+
+    (check-equal? (from-keys-to-value-key '(("b" . 1) ("a" . 1))) "a1.b1")
+
+    (check-equal? (from-keys-to-value-key '(("c" . 2) ("b" . 1) ("a" . 2))) "a2.b1.c2")
+
+    (check-equal? (from-keys-to-value-key '(("d" . 3) ("c" . 2) ("b" . 1) ("a" . 2))) "a2.b1.c2.d3")
+    )
+
   ))
 
 (run-tests test-lib)

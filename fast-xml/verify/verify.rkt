@@ -154,18 +154,18 @@
     (let ([xml_hash
            (xml-file-to-hash
             data_xml_file
-            '("empty" "empty.attr1" "empty.attr2")
+            '("data.empty" "data.empty.attr1" "data.empty.attr2")
             stderr_port
             (current-output-port)
             )])
       
       (fprintf stderr_port "~a\n" xml_hash)
 
-      (check-equal? (hash-count xml_hash) 4)
-      (check-equal? (hash-ref xml_hash "empty's count") 1)
-      (check-equal? (hash-ref xml_hash "empty1") "")
-      (check-equal? (hash-ref xml_hash "empty2") "3")
-      (check-equal? (hash-ref xml_hash "empty3") "")
-      (check-equal? (hash-ref xml_hash "empty1.attr1") "a1")
-      (check-equal? (hash-ref xml_hash "empty1.attr2") "a2")
+      (check-equal? (hash-count xml_hash) 7)
+      (check-equal? (hash-ref xml_hash "data1.empty's count") 1)
+      (check-equal? (hash-ref xml_hash "data1.empty1") "")
+      (check-equal? (hash-ref xml_hash "data1.empty2") "3")
+      (check-equal? (hash-ref xml_hash "data1.empty3") "")
+      (check-equal? (hash-ref xml_hash "data1.empty1.attr11") "a1")
+      (check-equal? (hash-ref xml_hash "data1.empty1.attr21") "a2")
 ))))
