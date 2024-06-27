@@ -31,13 +31,13 @@
 
       (check-equal? (hash-ref xml_hash "worksheet1.cols1.col's count") 3)
 
-      (check-equal? (hash-ref xml_hash "worksheet1.xmlns") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
+      (check-equal? (hash-ref xml_hash "worksheet1.xmlns1") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
 
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1.test") "2")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.test1") "2")
 
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col1.collapsed") "1")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col1.collapsed1") "1")
 
-      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col2.collapsed") "2")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col2.collapsed1") "2")
       ))
   ))
 
