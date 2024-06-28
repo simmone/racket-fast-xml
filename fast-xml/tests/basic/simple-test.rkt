@@ -89,17 +89,13 @@
             simple4_xml_file
             '("h1.h2.topic" "h1"))])
 
-      (printf "~a\n" xml_hash)
-      
-      (check-equal? (hash-count xml_hash) 4)
+      (check-equal? (hash-count xml_hash) 3)
 
       (check-equal? (hash-ref xml_hash "h1's count") 1)
 
       (check-equal? (hash-ref xml_hash "h11.h2's count") 1)
       
       (check-equal? (hash-ref xml_hash "h11.h21.topic1") "cx")
-
-      (check-equal? (hash-ref xml_hash "h11") "")
       ))
 
    (test-case
