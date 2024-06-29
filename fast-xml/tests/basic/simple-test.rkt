@@ -26,8 +26,8 @@
               "?xml.encoding"
               "basic1.value"
               ))])
-
-      (check-equal? (hash-count xml_hash) 5)
+      
+      (check-equal? (hash-count xml_hash) 6)
 
       (check-equal? (hash-ref xml_hash "?xml's count") 1)
 
@@ -36,6 +36,8 @@
       (check-equal? (hash-ref xml_hash "?xml1.encoding1") "UTF-8")
 
       (check-equal? (hash-ref xml_hash "basic1's count") 1)
+
+      (check-equal? (hash-ref xml_hash "basic11.value's count") 1)
 
       (check-equal? (hash-ref xml_hash "basic11.value1") "1")
       ))
@@ -56,11 +58,13 @@
            (xml-file-to-hash
             simple2_xml_file
             '("h1.h2.topic"))])
-      (check-equal? (hash-count xml_hash) 3)
+      (check-equal? (hash-count xml_hash) 4)
 
       (check-equal? (hash-ref xml_hash "h1's count") 1)
 
       (check-equal? (hash-ref xml_hash "h11.h2's count") 1)
+
+      (check-equal? (hash-ref xml_hash "h11.h21.topic's count") 1)
       
       (check-equal? (hash-ref xml_hash "h11.h21.topic1") "cx")
       ))
@@ -72,11 +76,13 @@
            (xml-file-to-hash
             simple3_xml_file
             '("h1.h2.topic"))])
-      (check-equal? (hash-count xml_hash) 3)
+      (check-equal? (hash-count xml_hash) 4)
 
       (check-equal? (hash-ref xml_hash "h1's count") 1)
 
       (check-equal? (hash-ref xml_hash "h11.h2's count") 1)
+
+      (check-equal? (hash-ref xml_hash "h11.h21.topic's count") 1)
       
       (check-equal? (hash-ref xml_hash "h11.h21.topic1") "cx")
       ))
@@ -89,11 +95,13 @@
             simple4_xml_file
             '("h1.h2.topic" "h1"))])
 
-      (check-equal? (hash-count xml_hash) 3)
+      (check-equal? (hash-count xml_hash) 4)
 
       (check-equal? (hash-ref xml_hash "h1's count") 1)
 
       (check-equal? (hash-ref xml_hash "h11.h2's count") 1)
+
+      (check-equal? (hash-ref xml_hash "h11.h21.topic's count") 1)
       
       (check-equal? (hash-ref xml_hash "h11.h21.topic1") "cx")
       ))
@@ -105,11 +113,13 @@
            (xml-file-to-hash
             simple5_xml_file
             '("h1.h2.topic"))])
-      (check-equal? (hash-count xml_hash) 3)
+      (check-equal? (hash-count xml_hash) 4)
 
       (check-equal? (hash-ref xml_hash "h1's count") 1)
 
       (check-equal? (hash-ref xml_hash "h11.h2's count") 1)
+
+      (check-equal? (hash-ref xml_hash "h11.h21.topic's count") 1)
       
       (check-equal? (hash-ref xml_hash "h11.h21.topic1") " cx ")
       ))
