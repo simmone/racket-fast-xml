@@ -83,8 +83,7 @@
                     (set! waiting_pure_key pure_key)
                     (set! waiting_value_key value_key))
 
-                  (when (or (eq? type 'k) (eq? type 'kv))
-                    (hash-set! xml_hash key_count (add1 (hash-ref xml_hash key_count 0)))))))
+                  (hash-set! xml_hash key_count (add1 (hash-ref xml_hash key_count 0))))))
 
             (key-reading-end ch)]
            [(eq? status 'KEY_PAIR_END)
@@ -168,12 +167,18 @@
     (let ([xml_hash
            (xml-file-to-hash
             data_xml_file
-            '("worksheet.xmlns")
+            '(
+              "list.child"
+              )
             stderr_port
             (current-output-port)
             )])
       
       (fprintf stderr_port "~a\n" xml_hash)
 
-      (check-equal? (hash-ref xml_hash "worksheet1.xmlns1") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
+      (check-equal? (hash-count xml_hash) 5)
+      
+      (check-equal? (hash-ref xml_hash "list1.child1") "c1")
+      (check-equal? (hash-ref xml_hash "list1.child2") "")
+      (check-equal? (hash-ref xml_hash "list1.child3") "c3")
       ))))

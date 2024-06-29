@@ -18,15 +18,29 @@
            (xml-file-to-hash
             complex_shells_xml_file
             '(
-              ("worksheet.cols.col.min" . a)
+              "worksheet.cols.col.min"
               )
               )])
 
-      (check-equal? (hash-count xml_hash) 1)
-      
-      (check-equal? (hash-ref xml_hash "worksheet.cols.col.min") '("1" "3" "4" "8" "13" "14" "16" "17" "18"
-                                                                   "22" "25" "27" "31" "33" "38" "39" "40"
-                                                                   "47" "48"))
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col1.min1") "1")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col2.min1") "3")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col3.min1") "4")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col4.min1") "8")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col5.min1") "13")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col6.min1") "14")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col7.min1") "16")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col8.min1") "17")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col9.min1") "18")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col10.min1") "22")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col11.min1") "25")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col12.min1") "27")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col13.min1") "31")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col14.min1") "33")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col15.min1") "38")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col16.min1") "39")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col17.min1") "40")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col18.min1") "47")
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col19.min1") "48")
       ))
   ))
 

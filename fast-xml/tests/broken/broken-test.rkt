@@ -20,7 +20,7 @@
       (check-equal? (hash-ref xml_hash "worksheet1.xmlns1") "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
 
     (let ([xml_hash
-           (xml-port-to-hash (open-input-file broken_xml_file '("worksheet.xmlns")))])
+           (xml-port-to-hash (open-input-file broken_xml_file) '("worksheet.xmlns"))])
       (check-equal? (hash-ref xml_hash "worksheet1.xmlns1") "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
     )
 

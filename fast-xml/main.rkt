@@ -80,8 +80,7 @@
                     (set! waiting_pure_key pure_key)
                     (set! waiting_value_key value_key))
 
-                  (when (or (eq? type 'k) (eq? type 'kv))
-                    (hash-set! xml_hash key_count (add1 (hash-ref xml_hash key_count 0)))))))
+                  (hash-set! xml_hash key_count (add1 (hash-ref xml_hash key_count 0))))))
 
             (key-reading-end ch)]
            [(eq? status 'KEY_PAIR_END)
