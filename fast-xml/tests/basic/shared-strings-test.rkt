@@ -19,34 +19,71 @@
     (let ([xml_hash (xml-file-to-hash
                      sharedStrings_xml_file
                      '(
-                       ("sst.count" . a)
-                       ("sst.uniqueCount" . a)
-                       ("sst.xmlns" . a)
-                       ("sst.si.t" . v)
-                       ("sst.si.phoneticPr.fontId" . a)
-                       ("sst.si.phoneticPr.type" . a)
+                       "sst.count"
+                       "sst.uniqueCount"
+                       "sst.xmlns"
+                       "sst.si.t"
+                       "sst.si.phoneticPr.fontId"
+                       "sst.si.phoneticPr.type"
                        ))])
       
-      (check-equal? (hash-ref xml_hash "sst.count") '("17"))
-      (check-equal? (hash-ref xml_hash "sst.uniqueCount") '("17"))
-      (check-equal? (hash-ref xml_hash "sst.xmlns") '("http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
+      (check-equal? (hash-ref xml_hash "sst1.count1") "17")
+      (check-equal? (hash-ref xml_hash "sst1.uniqueCount1") "17")
+      (check-equal? (hash-ref xml_hash "sst1.xmlns1") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
 
-      (check-equal? (hash-ref xml_hash "sst.si.t") '("" "201601" "201602" "201603" "201604"
-                                                     "201605" "Asics" "Bottom" "CAT" "Center"
-                                                     "Center/Middle" "Left" "Middle" "Puma" "Right"
-                                                     "Top" "month/brand"))
+      (check-equal? (hash-ref xml_hash "sst1.si1.t1") "")
+      (check-equal? (hash-ref xml_hash "sst1.si2.t1") "201601")
+      (check-equal? (hash-ref xml_hash "sst1.si3.t1") "201602")
+      (check-equal? (hash-ref xml_hash "sst1.si4.t1") "201603")
+      (check-equal? (hash-ref xml_hash "sst1.si5.t1") "201604")
+      (check-equal? (hash-ref xml_hash "sst1.si6.t1") "201605")
+      (check-equal? (hash-ref xml_hash "sst1.si7.t1") "Asics")
+      (check-equal? (hash-ref xml_hash "sst1.si8.t1") "Bottom")
+      (check-equal? (hash-ref xml_hash "sst1.si9.t1") "CAT")
+      (check-equal? (hash-ref xml_hash "sst1.si10.t1") "Center")
+      (check-equal? (hash-ref xml_hash "sst1.si11.t1") "Center/Middle")
+      (check-equal? (hash-ref xml_hash "sst1.si12.t1") "Left")
+      (check-equal? (hash-ref xml_hash "sst1.si13.t1") "Middle")
+      (check-equal? (hash-ref xml_hash "sst1.si14.t1") "Puma")
+      (check-equal? (hash-ref xml_hash "sst1.si15.t1") "Right")
+      (check-equal? (hash-ref xml_hash "sst1.si16.t1") "Top")
+      (check-equal? (hash-ref xml_hash "sst1.si17.t1") "month/brand")
 
-      (check-equal? (hash-ref xml_hash "sst.si.phoneticPr.fontId")
-                    '("1" "1" "1" "1" "1"
-                      "1" "1" "1" "1" "1"
-                      "1" "1" "1" "1" "1"
-                      "1" "1"))
+      (check-equal? (hash-ref xml_hash "sst1.si1.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si2.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si3.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si4.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si5.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si6.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si7.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si8.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si9.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si10.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si11.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si12.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si13.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si14.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si15.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si16.phoneticPr1.fontId1") "1")
+      (check-equal? (hash-ref xml_hash "sst1.si17.phoneticPr1.fontId1") "1")
 
-      (check-equal? (hash-ref xml_hash "sst.si.phoneticPr.type")
-                    '("noConversion" "noConversion" "noConversion" "noConversion" "noConversion"
-                      "noConversion" "noConversion" "noConversion" "noConversion" "noConversion"
-                      "noConversion" "noConversion" "noConversion" "noConversion" "noConversion"
-                      "noConversion" "noConversion"))
+      (check-equal? (hash-ref xml_hash "sst1.si1.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si2.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si3.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si4.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si5.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si6.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si7.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si8.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si9.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si10.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si11.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si12.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si13.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si14.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si15.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si16.phoneticPr1.type1") "noConversion")
+      (check-equal? (hash-ref xml_hash "sst1.si17.phoneticPr1.type1") "noConversion")
       ))
 
    (test-case

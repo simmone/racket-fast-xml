@@ -1,8 +1,7 @@
 # Fast-Xml: Simplified XML Parsing and Writing
 
 Use xml-to-hash, specify the element/attribute’s hierach, ie:
-"list.a.v", then you can use hash-ref to get xml element/attribute as a
-list.
+"list.a.v", then you can use hash-ref to get xml element/attribute.
 
 Use lists-to-xml(lists-to-compact\_xml), convert recursive list to
 generate xml, remove redundant format, more readable.
@@ -32,12 +31,18 @@ raco pkg install fast-xml
 
 * Load xml to hash map.
 
-* Use hierachy to access all the nodes’s attribute and content, each
-  item is a pair, cons hierachy ’a or ’v. ’a means this item is a
-  attribute, ’v means this item is a value. ’\(\("list.a.element" . v\)
-  \("list.a.attribute" . a\)\)
+* Specify a hierachy string list to get value or attribute:
+  ’\("list.a.element" "list.a.attribute"\)
 
-* Result is a list of string.
+* Result is a string.
+
+* Node value vs Attribute, If node value is null: ></ or />, node value
+  is "", if attribute not exist, value is not exist in result map too.
+
+* Every parent node has a "xxx’s count" value, tells this level’s node’s
+  count.
+
+* Use sequence appended after node name to get value or attribute
 
 ### 2.1. Basic Usage
 
@@ -50,23 +55,30 @@ xml:
 xml-to-hash:
 
 ```racket
-(let ([xml_hash (xml-file-to-hash                                  
-                 empty2_xml_file                                   
-                 '(("empty" "empty.attr1" . a) ("empty.attr2" . a))
-                )])                                                
-  (printf "xml hash has ~a keys.\n" (hash-count xml_hash))         
-                                                                   
-  (printf "empty: ~a\n" (hash-ref xml_hash "empty"))               
-                                                                   
-  (printf "empty.attr1: ~a\n" (hash-ref xml_hash "empty.attr1"))   
-                                                                   
-  (printf "empty.attr2: ~a\n" (hash-ref xml_hash "empty.attr2"))   
-)                                                                  
-                                                                   
-xml hash has 3 keys.                                               
-empty: (v)                                                         
-empty.attr1: (a1)                                                  
-empty.attr2: (a2)                                                  
+(let ([xml_hash (xml-file-to-hash                                   
+                 empty2_xml_file                                    
+                 '(                                                 
+                   "empty"                                          
+                   "empty.attr1"                                    
+                   "empty.attr2"                                    
+                   )                                                
+                )])                                                 
+                                                                    
+  (printf "xml hash has ~a keys.\n" (hash-count xml_hash))          
+                                                                    
+  (printf "empty's count: ~a\n" (hash-ref xml_hash "empty's count"))
+                                                                    
+  (printf "empty's value: ~a\n" (hash-ref xml_hash "empty1"))       
+                                                                    
+  (printf "empty.attr1: ~a\n" (hash-ref xml_hash "empty1.attr11"))  
+                                                                    
+  (printf "empty.attr2: ~a\n" (hash-ref xml_hash "empty1.attr21"))) 
+                                                                    
+xml hash has 4 keys.                                                
+empty's count: 1                                                    
+empty's value: v                                                    
+empty.attr1: a1                                                     
+empty.attr2: a2                                                     
 ```
 
 Be careful, if xml is below style, then node "empty"’s value is "".
@@ -94,19 +106,25 @@ xml:
 ```
 
 ```racket
-(let ([xml_hash (xml-file-to-hash "hierachy.xml" '(("level1.level2.level3.attr" . a) ("level1.level2.level3.level4" . v)))])
-  (printf "level1.level2.level3.attr: [~a]\n" (hash-ref xml_hash "level1.level2.level3.attr"))                              
-                                                                                                                            
-  (printf "level1.level2.level3.level4: [~a]\n" (hash-ref xml_hash "level1.level2.level3.level4"))                          
-)                                                                                                                           
-                                                                                                                            
-level1.level2.level3.attr: [(a3)]                                                                                           
-level1.level2.level3.level4: [(Hello Xml!)]                                                                                 
+(let ([xml_hash (xml-file-to-hash                                                                     
+                 "hierachy.xml"                                                                       
+                 '(                                                                                   
+                   "level1.level2.level3.attr"                                                        
+                   "level1.level2.level3.level4"                                                      
+                   ))])                                                                               
+                                                                                                      
+  (printf "level1.level2.level3.attr: [~a]\n" (hash-ref xml_hash "level11.level21.level31.attr1"))    
+                                                                                                      
+  (printf "level1.level2.level3.level4: [~a]\n" (hash-ref xml_hash "level11.level21.level31.level41"))
+)                                                                                                     
+                                                                                                      
+level1.level2.level3.attr: [a3]                                                                       
+level1.level2.level3.level4: [Hello Xml!]                                                             
 ```
 
 ### 2.3. Default Attribute
 
-If some node has no some attribute, then it get a default "" value.
+If some node has no some attribute, then the value is not exists.
 
 xml:
 
@@ -119,17 +137,19 @@ xml:
 ```
 
 ```racket
-(let ([xml_hash (xml-file-to-hash                                         
-                 "default.xml"                                            
-                 '(                                                       
-                   ("list.child.attr" . a)                                
-                   ))])                                                   
-                                                                          
-  (printf "list.child.attr: [~a]\n" (hash-ref xml_hash "list.child.attr"))
-)                                                                         
-                                                                          
-list.child.attr: [(a1  a3)]                                               
-                                                                          
+(let ([xml_hash (xml-file-to-hash                                                  
+                 "default.xml"                                                     
+                 '(                                                                
+                   "list.child.attr"                                               
+                   ))])                                                            
+                                                                                   
+  (printf "list1.child1.attr1: [~a]\n" (hash-ref xml_hash "list1.child1.attr1"))   
+                                                                                   
+  (printf "list1.child1.attr2: [~a]\n" (hash-ref xml_hash "list1.child1.attr2" ""))
+)                                                                                  
+                                                                                   
+list1.child1.attr1: [a1]                                                           
+list1.child1.attr2: []                                                             
 ```
 
 ## 3. lists-to-xml

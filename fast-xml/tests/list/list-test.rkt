@@ -21,13 +21,18 @@
            (xml-file-to-hash
             list1_xml_file
             '(
-              ("list.child" . v)
-              ("list.child.attr" . a)
+              "list.child"
+              "list.child.attr"
               ))])
-      (check-equal? (hash-count xml_hash) 2)
+
+      (check-equal? (hash-count xml_hash) 8)
       
-      (check-equal? (hash-ref xml_hash "list.child") '("c1" "c2" "c3"))
-      (check-equal? (hash-ref xml_hash "list.child.attr") '("a1" "a2" "a3"))
+      (check-equal? (hash-ref xml_hash "list1.child1") "c1")
+      (check-equal? (hash-ref xml_hash "list1.child2") "c2")
+      (check-equal? (hash-ref xml_hash "list1.child3") "c3")
+      (check-equal? (hash-ref xml_hash "list1.child1.attr1") "a1")
+      (check-equal? (hash-ref xml_hash "list1.child2.attr1") "a2")
+      (check-equal? (hash-ref xml_hash "list1.child3.attr1") "a3")
       ))
 
    (test-case
@@ -50,13 +55,31 @@
            (xml-file-to-hash
             list2_xml_file
             '(
-              ("list.child" . v)
-              ("list.child.attr" . a)
+              "list.child"
+              "list.child.attr"
               ))])
-      (check-equal? (hash-count xml_hash) 2)
       
-      (check-equal? (hash-ref xml_hash "list.child") '("c1" "c2" "c3" "c4" "c5" "c6"))
-      (check-equal? (hash-ref xml_hash "list.child.attr") '("a1" "a2" "a3" "a4" "a5" "a6"))
+      (check-equal? (hash-count xml_hash) 15)
+
+      (check-equal? (hash-ref xml_hash "list's count") 2)
+
+      (check-equal? (hash-ref xml_hash "list1.child's count") 3)
+      (check-equal? (hash-ref xml_hash "list1.child1") "c1")
+      (check-equal? (hash-ref xml_hash "list1.child2") "c2")
+      (check-equal? (hash-ref xml_hash "list1.child3") "c3")
+
+      (check-equal? (hash-ref xml_hash "list2.child's count") 3)
+      (check-equal? (hash-ref xml_hash "list2.child1") "c4")
+      (check-equal? (hash-ref xml_hash "list2.child2") "c5")
+      (check-equal? (hash-ref xml_hash "list2.child3") "c6")
+
+      (check-equal? (hash-ref xml_hash "list1.child1.attr1") "a1")
+      (check-equal? (hash-ref xml_hash "list1.child2.attr1") "a2")
+      (check-equal? (hash-ref xml_hash "list1.child3.attr1") "a3")
+
+      (check-equal? (hash-ref xml_hash "list2.child1.attr1") "a4")
+      (check-equal? (hash-ref xml_hash "list2.child2.attr1") "a5")
+      (check-equal? (hash-ref xml_hash "list2.child3.attr1") "a6")
       ))
 
    (test-case
@@ -66,21 +89,26 @@
            (xml-file-to-hash
             list3_xml_file
             '(
-              ("list.child" . v)
+              "list.child"
               ))])
-      (check-equal? (hash-count xml_hash) 1)
       
-      (check-equal? (hash-ref xml_hash "list.child") '("c1" "" "c3"))
+      (check-equal? (hash-count xml_hash) 5)
+      
+      (check-equal? (hash-ref xml_hash "list1.child1") "c1")
+      (check-equal? (hash-ref xml_hash "list1.child2") "")
+      (check-equal? (hash-ref xml_hash "list1.child3") "c3"))
 
     (let ([xml_hash
            (xml-file-to-hash
             list3_xml_file
             '(
-              ("list.child.attr" . a)
+              "list.child.attr"
               ))])
-      (check-equal? (hash-count xml_hash) 1)
+      (check-equal? (hash-count xml_hash) 5)
       
-      (check-equal? (hash-ref xml_hash "list.child.attr") '("a1" "a2" "a3")))
+      (check-equal? (hash-ref xml_hash "list1.child1.attr1") "a1")
+      (check-equal? (hash-ref xml_hash "list1.child2.attr1") "a2")
+      (check-equal? (hash-ref xml_hash "list1.child3.attr1") "a3")
     ))
 
    (test-case
@@ -90,13 +118,24 @@
            (xml-file-to-hash
             list4_xml_file
             '(
-              ("list.child" . v)
-              ("list.child.attr" . a)
+              "list.child"
+              "list.child.attr"
               ))])
-      (check-equal? (hash-count xml_hash) 2)
+
+      (check-equal? (hash-count xml_hash) 14)
       
-      (check-equal? (hash-ref xml_hash "list.child") '("c1" "" "c3" "" "c4" "" "" ""))
-      (check-equal? (hash-ref xml_hash "list.child.attr") '("a1" "a2" "a3" "" "" "" "" "a6"))
+      (check-equal? (hash-ref xml_hash "list1.child1") "c1")
+      (check-equal? (hash-ref xml_hash "list1.child2") "")
+      (check-equal? (hash-ref xml_hash "list1.child3") "c3")
+      (check-equal? (hash-ref xml_hash "list1.child4") "")
+      (check-equal? (hash-ref xml_hash "list1.child5") "c4")
+      (check-equal? (hash-ref xml_hash "list1.child6") "")
+      (check-equal? (hash-ref xml_hash "list1.child7") "")
+      (check-equal? (hash-ref xml_hash "list1.child8") "")
+      (check-equal? (hash-ref xml_hash "list1.child1.attr1") "a1")
+      (check-equal? (hash-ref xml_hash "list1.child2.attr1") "a2")
+      (check-equal? (hash-ref xml_hash "list1.child3.attr1") "a3")
+      (check-equal? (hash-ref xml_hash "list1.child8.attr1") "a6")
       ))
 
   ))

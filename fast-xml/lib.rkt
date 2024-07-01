@@ -1,10 +1,13 @@
 #lang racket
 
 (provide (contract-out
-          [defs-to-hash (-> (listof (cons/c string? (or/c 'v 'a))) (values hash? hash?))]
+          [defs-to-hash (-> (listof string?) hash?)]
           [from-special-chars (-> string? string?)]
           [to-special-chars (-> (or/c string? symbol?) string?)]
           [STATUS? (-> symbol? boolean?)]
+          [from-keys-to-pure-key (-> (listof (cons/c string? natural?)) string?)]
+          [from-keys-to-value-key (-> (listof (cons/c string? natural?)) string?)]
+          [from-keys-to-count-key (-> (listof (cons/c string? natural?)) string?)]
           ))
 
 (define (STATUS? status)
@@ -54,30 +57,58 @@
      )))
 
 (define (defs-to-hash def_list)
-  (let ([def_hash (make-hash)]
-        [attr_hash (make-hash)])
+  (let ([def_hash (make-hash)])
     (let loop-def ([defs def_list])
       (when (not (null? defs))
-
-        (hash-set! def_hash (caar defs) (cdar defs))
-
-        (let ([def_items (regexp-split #rx"\\." (caar defs))])
+        (let ([def_items (regexp-split #rx"\\." (car defs))])
           (let loop-items ([items def_items]
                            [last_keys '()])
             (when (not (null? items))
               (let* ([keys (cons (car items) last_keys)]
                      [key (string-join (reverse keys) ".")]
-                     [type (hash-ref def_hash key 'k)])
+                     [type (hash-ref def_hash key #f)])
 
-                (hash-set! def_hash key type)
-                
-                (when (eq? type 'a)
-                  (let* ([node (string-join (reverse last_keys) ".")]
-                         [default_hash (hash-ref attr_hash node (make-hash))])
-                    (hash-set! default_hash key #f)
-                    (hash-set! attr_hash node default_hash)))
+                (if (string=? (car defs) key)
+                    (if type
+                        (cond
+                         [(eq? type 'k)
+                          (hash-set! def_hash key 'kv)]
+                         [(eq? type 'v)
+                          (hash-set! def_hash key 'v)])
+                        (hash-set! def_hash key 'v))
+                    (if type
+                        (when (eq? type 'v)
+                          (hash-set! def_hash key 'kv))
+                        (hash-set! def_hash key 'k)))
 
                 (loop-items (cdr items) keys))))
           )
         (loop-def (cdr defs))))
-    (values def_hash attr_hash)))
+    def_hash))
+
+(define (from-keys-to-value-key keys)
+  (let ([_keys (map (lambda (k) (format "~a~a" (car k) (cdr k))) keys)])
+    (if (> (length _keys) 1)
+        (string-join (reverse _keys) ".")
+        (car _keys))))
+
+(define (from-keys-to-pure-key keys)
+  (let ([_keys (map car keys)])
+    (if (> (length _keys) 1)
+        (string-join (reverse _keys) ".")
+        (car _keys))))
+
+(define (from-keys-to-count-key keys)
+  (let loop ([_keys (reverse keys)]
+             [result_str ""])
+    (if (not (null? _keys))
+        (loop
+         (cdr _keys)
+         (format "~a~a"
+                 (if (string=? result_str "")
+                     ""
+                     (format "~a." result_str))
+                 (if (= (length _keys) 1)
+                     (caar _keys)
+                     (format "~a~a" (caar _keys) (cdar _keys)))))
+        result_str)))

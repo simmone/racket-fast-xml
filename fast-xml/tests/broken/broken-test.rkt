@@ -14,15 +14,14 @@
    (test-case
     "test-broken"
 
-    (check-exn
-     exn:fail?
-     (lambda ()
-       (xml-file-to-hash broken_xml_file)))
+    (let ([xml_hash
+           (xml-file-to-hash broken_xml_file '("worksheet.xmlns"))])
 
-    (check-exn
-     exn:fail?
-     (lambda ()
-       (xml-port-to-hash (open-input-file broken_xml_file))))
+      (check-equal? (hash-ref xml_hash "worksheet1.xmlns1") "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
+
+    (let ([xml_hash
+           (xml-port-to-hash (open-input-file broken_xml_file) '("worksheet.xmlns"))])
+      (check-equal? (hash-ref xml_hash "worksheet1.xmlns1") "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
     )
 
   ))

@@ -27,20 +27,18 @@
       (xml-port-to-hash (current-input-port) def_list stderr_port out_port))))
 
 (define (xml-port-to-hash xml_port def_list stderr_port out_port)
-  (let ([xml_hash (make-hash)])
+  (let ([xml_hash (make-hash)]
+        [def_hash (defs-to-hash def_list)])
 
-    (define-values
-        (def_hash attr_def_hash)
-      (defs-to-hash def_list))
+    (printf "~a\n" def_hash)
 
     (let loop ([status 'TRAVERSE_START]
                [ch (read-char xml_port)]
                [count 0]
                [keys '()]
                [chars '()]
-               [waiting_key #f]
-               [key_value_obtained #f]
-               [attr_hash #f])
+               [waiting_pure_key #f]
+               [waiting_value_key #f])
 
       (when (= (remainder count (* 1024 1024 1)) 0)
         (fprintf stderr_port "~aMk\n" (/ count (* 1024 1024 1))))
@@ -60,90 +58,102 @@
            [(eq? status 'ATTR_VALUE_WAITING) (attr-value-waiting ch)]
            [(eq? status 'ATTR_VALUE_READING) (attr-value-reading ch)]
            [(eq? status 'KEY_END)
-            (let* ([key (if (> (length keys) 1)
-                            (string-join (reverse keys) ".")
-                            (car keys))])
-
-              (when (hash-has-key? attr_def_hash key)
-                (hash-for-each
-                 (hash-ref attr_def_hash key)
-                 (lambda (k v)
-                   (let ([attr_setted
-                          (if attr_hash
-                              (if (hash-has-key? attr_hash k)
-                                  (hash-ref attr_hash k)
-                                  #f)
-                              #f)])
-                     (when (not attr_setted)
-                       (hash-set! xml_hash k `(,@(hash-ref xml_hash k '()) "")))))))
-
-              (when (hash-has-key? attr_def_hash key)
-                (set! attr_hash (hash-copy (hash-ref attr_def_hash key)))))
-
-            (set! attr_hash #f)
+            (let* ([pure_key (from-keys-to-pure-key keys)]
+                   [count_key (from-keys-to-count-key keys)]
+                   [value_key (from-keys-to-value-key keys)]
+                   )
+              
+              (when (hash-has-key? def_hash pure_key)
+                (let ([type (hash-ref def_hash pure_key)])
+                  (when (or (eq? type 'v) (eq? type 'kv))
+                    (set! waiting_pure_key pure_key)
+                    (set! waiting_value_key value_key)))))
 
             (key-end ch)]
            [(eq? status 'KEY_READING_END)
-            (let* ([key (if (> (length keys) 1)
-                            (string-join (reverse keys) ".")
-                            (car keys))])
+            (let* ([pure_key (from-keys-to-pure-key keys)]
+                   [count_key (from-keys-to-count-key keys)]
+                   [key_count (format "~a's count" count_key)]
+                   [value_key (from-keys-to-value-key keys)]
+                   )
 
-              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
-                (set! waiting_key key)
-                (set! key_value_obtained #f))
+              (when (hash-has-key? def_hash pure_key)
+                (let ([type (hash-ref def_hash pure_key)])
+                  (when (or (eq? type 'v) (eq? type 'kv))
+                    (set! waiting_pure_key pure_key)
+                    (set! waiting_value_key value_key))
 
-              (when (hash-has-key? attr_def_hash key)
-                (set! attr_hash (hash-copy (hash-ref attr_def_hash key)))))
+                  (hash-set! xml_hash key_count (add1 (hash-ref xml_hash key_count 0))))))
 
             (key-reading-end ch)]
            [(eq? status 'KEY_PAIR_END)
-            (let* ([key (if (> (length keys) 1)
-                            (string-join (reverse keys) ".")
-                            (car keys))])
-              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v) (not key_value_obtained))
-                (hash-set! xml_hash key `(,@(hash-ref xml_hash key '()) ""))))
+            (when waiting_pure_key
+              (hash-set! xml_hash waiting_value_key
+                         (if (null? chars)
+                             ""
+                             (from-special-chars (list->string (reverse (cdr chars)))))))
+
+            (set! waiting_pure_key #f)
+            (set! waiting_value_key #f)
 
             (set! keys (cdr keys))
-            (set! key_value_obtained #f)
             (values 'KEY_WAITING #t #f #f)]
            [(eq? status 'ATTR_KEY_END)
-            (let ([key (string-join (reverse keys) ".")])
-              (when (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'a))
-                (set! waiting_key key)))
+            (let* ([pure_key (from-keys-to-pure-key keys)]
+                   [count_key (from-keys-to-count-key keys)]
+                   [value_key (from-keys-to-value-key keys)]
+                   )
+              (when (hash-has-key? def_hash pure_key)
+                (let ([type (hash-ref def_hash pure_key)])
+                  (when (or (eq? type 'v) (eq? type 'kv))
+                    (set! waiting_pure_key pure_key)
+                    (set! waiting_value_key value_key)))))
 
             (set! keys (cdr keys))
+
             (values 'ATTR_VALUE_READING #t #f #f)]
            [(eq? status 'ATTR_VALUE_END)
-            (when (and waiting_key (hash-has-key? def_hash waiting_key) (eq? (hash-ref def_hash waiting_key) 'a))
-              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(list->string (reverse (cdr chars)))))
-              (hash-set! attr_hash waiting_key #t))
+            (when waiting_pure_key
+              (when (hash-has-key? def_hash waiting_pure_key)
+                (let ([type (hash-ref def_hash waiting_pure_key)])
+                  (when (or (eq? type 'v) (eq? type 'kv))
+                    (hash-set! xml_hash waiting_value_key (from-special-chars (list->string (reverse (cdr chars)))))))))
 
-            (let ([key (string-join (reverse keys) ".")])
-              (if (and (hash-has-key? def_hash key) (eq? (hash-ref def_hash key) 'v))
-                  (set! waiting_key key)
-                  (set! waiting_key #f)))
+            (set! waiting_pure_key #f)
+            (set! waiting_value_key #f)
 
             (attr-value-end ch)]
            [(eq? status 'KEY_VALUE_END)
-            (when waiting_key
-              (hash-set! xml_hash waiting_key `(,@(hash-ref xml_hash waiting_key '()) ,(list->string (reverse (cdr chars)))))
-              (set! key_value_obtained #t))
+            (when waiting_pure_key
+              (hash-set! xml_hash waiting_value_key
+                         (if (null? chars)
+                             ""
+                             (from-special-chars (list->string (reverse (cdr chars)))))))
 
-            (set! waiting_key #f)
+            (set! waiting_pure_key #f)
+            (set! waiting_value_key #f)
             (values 'KEY_WAITING #f #f #f)]
            ))
 
-        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_key key_value_obtained attr_hash)
+        (fprintf out_port "|~a[~a,~a,~a]|[~a]|~a|~a|~a|~a|\n" status read_char? reserve_key? reserve_char? ch keys chars waiting_pure_key waiting_value_key)
 
         (loop
          next_status
          (if read_char? (read-char xml_port) ch)
          (if read_char? (add1 count) count)
-         (if reserve_key? (if (> (length chars) 0) (cons (list->string (reverse chars)) keys) keys) keys)
+         (if reserve_key?
+             (let* ([key (list->string (reverse chars))]
+                    [_keys (cons (cons key 0) keys)]
+                    [count_key (from-keys-to-count-key _keys)]
+                    [key_count (format "~a's count" count_key)])
+
+               (if (> (string-length key) 0)
+                   (cons (cons key (add1 (hash-ref xml_hash key_count 0))) keys)
+                   keys))
+               keys)
          (if reserve_char? (cons ch chars) '())
-         waiting_key
-         key_value_obtained
-         attr_hash)))
+         waiting_pure_key
+         waiting_value_key)))
     xml_hash))
 
 (let ([stderr_port (current-error-port)])
@@ -151,23 +161,24 @@
       show_file
     #:exists 'replace
     (lambda ()
-      (printf "| Status | Char | Keys | Chars | Waiting Key| Key Value Obtained | Attr Hash |\n")
-      (printf "|--------|------|------|-------|------------|--------------------|-----------|\n")
+      (printf "| Status | Char | Keys | Chars | Waiting Pure Key| Waiting Value Key |\n")
+      (printf "|--------|------|------|-------|-----------------|-------------------|\n")
 
     (let ([xml_hash
            (xml-file-to-hash
             data_xml_file
             '(
-              ("sheetData.row.c.t" . a)
+              "list.child"
               )
             stderr_port
             (current-output-port)
             )])
+      
+      (fprintf stderr_port "~a\n" xml_hash)
 
-      (check-equal? (hash-ref xml_hash "sheetData.row.c.t") '(
-                                                                        "s" "s" "s" "s" "s" "s"
-                                                                        "s" ""  ""  ""  ""  ""
-                                                                        "s" ""  ""  ""  ""  ""
-                                                                        "s" ""  ""  ""  ""  ""
-                                                                        ))
-))))
+      (check-equal? (hash-count xml_hash) 5)
+      
+      (check-equal? (hash-ref xml_hash "list1.child1") "c1")
+      (check-equal? (hash-ref xml_hash "list1.child2") "")
+      (check-equal? (hash-ref xml_hash "list1.child3") "c3")
+      ))))

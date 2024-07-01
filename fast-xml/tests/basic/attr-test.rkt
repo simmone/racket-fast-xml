@@ -18,18 +18,26 @@
            (xml-file-to-hash
             attr1_xml_file
             '(
-              ("worksheet.xmlns" . a)
-              ("worksheet.cols.test" . a)
-              ("worksheet.cols.col.collapsed" . a)
+              "worksheet.xmlns"
+              "worksheet.cols.test"
+              "worksheet.cols.col.collapsed"
               ))])
 
-      (check-equal? (hash-count xml_hash) 3)
+      (check-equal? (hash-count xml_hash) 7)
 
-      (check-equal? (hash-ref xml_hash "worksheet.xmlns") '("http://schemas.openxmlformats.org/spreadsheetml/2006/main"))
+      (check-equal? (hash-ref xml_hash "worksheet's count") 1)
 
-      (check-equal? (hash-ref xml_hash "worksheet.cols.test") '("2"))
+      (check-equal? (hash-ref xml_hash "worksheet1.cols's count") 1)
 
-      (check-equal? (hash-ref xml_hash "worksheet.cols.col.collapsed") '("1" "2" ""))
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col's count") 3)
+
+      (check-equal? (hash-ref xml_hash "worksheet1.xmlns1") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
+
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.test1") "2")
+
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col1.collapsed1") "1")
+
+      (check-equal? (hash-ref xml_hash "worksheet1.cols1.col2.collapsed1") "2")
       ))
   ))
 
