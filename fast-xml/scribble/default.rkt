@@ -8,8 +8,10 @@
 (let ([xml_hash (xml-file-to-hash
                  "default.xml"
                  '(
-                   ("list.child.attr" . a)
+                   "list.child.attr"
                    ))])
 
-  (printf "list.child.attr: [~a]\n" (hash-ref xml_hash "list.child.attr"))
+  (printf "list1.child1.attr1: [~a]\n" (hash-ref xml_hash "list1.child1.attr1"))
+
+  (printf "list1.child1.attr2: [~a]\n" (hash-ref xml_hash "list1.child1.attr2" ""))
 )
