@@ -168,7 +168,7 @@
            (xml-file-to-hash
             data_xml_file
             '(
-              "list.child"
+              "Properties.TitlesOfParts.vt:vector.vt:lpstr"
               )
             stderr_port
             (current-output-port)
@@ -176,9 +176,13 @@
       
       (fprintf stderr_port "~a\n" xml_hash)
 
-      (check-equal? (hash-count xml_hash) 5)
-      
-      (check-equal? (hash-ref xml_hash "list1.child1") "c1")
-      (check-equal? (hash-ref xml_hash "list1.child2") "")
-      (check-equal? (hash-ref xml_hash "list1.child3") "c3")
+      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector's count") 1)
+      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr's count") 6)
+
+      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr1") "数据页面")
+      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr2") "Sheet2")
+      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr3") "Sheet3")
+      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr4") "Chart1")
+      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr5") "Chart4")
+      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr6") "Chart5")
       ))))
