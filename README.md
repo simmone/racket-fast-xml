@@ -14,6 +14,7 @@ Chen Xiao <[chenxiao770117@gmail.com](mailto:chenxiao770117@gmail.com)>
       2.1 Basic Usage      
       2.2 Hierachy         
       2.3 Default Attribute
+      2.4 Entity Convert   
                            
     3 lists-to-xml         
                            
@@ -151,6 +152,31 @@ xml:
 list1.child1.attr1: [a1]                                                           
 list1.child1.attr2: []                                                             
 ```
+
+### 2.4. Entity Convert
+
+There are two kinds of entity:
+
+1. numeric character reference
+
+&\#xhhhh; or  &\#nnnn;
+
+where the x must be lowercase in XML documents, hhhh is the code point
+in hexadecimal form, and nnnn is the code point in decimal form.
+
+2. 5 predefined name
+
+&name;
+
+```racket
+&amp;[&], &lt;[<], &gt;[>], &apos;['], and &quot;["].
+```
+
+when reading from xml, attributes and values will be convert from entity
+to specific character.
+
+when writing to xml, in attributes and values, 5 special chars will be
+converted to entity string.
 
 ## 3. lists-to-xml
 

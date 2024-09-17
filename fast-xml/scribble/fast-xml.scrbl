@@ -146,7 +146,9 @@ There are two kinds of entity:
  
   &name;
 
+@codeblock{
   &amp;[&], &lt;[<], &gt;[>], &apos;['], and &quot;["].
+}
 
 when reading from xml, attributes and values will be convert from entity to specific character.
 
