@@ -9,6 +9,7 @@
           ))
 
 (require "lib.rkt"
+         "entity.rkt"
          "status/key-start.rkt"
          "status/key-waiting.rkt"
          "status/key-reading.rkt"
@@ -89,7 +90,7 @@
               (hash-set! xml_hash waiting_value_key
                          (if (null? chars)
                              ""
-                             (from-special-chars (list->string (reverse (cdr chars)))))))
+                             (from-entity-chars (list->string (reverse (cdr chars)))))))
 
             (set! waiting_pure_key #f)
             (set! waiting_value_key #f)
@@ -115,7 +116,7 @@
               (when (hash-has-key? def_hash waiting_pure_key)
                 (let ([type (hash-ref def_hash waiting_pure_key)])
                   (when (or (eq? type 'v) (eq? type 'kv))
-                    (hash-set! xml_hash waiting_value_key (from-special-chars (list->string (reverse (cdr chars)))))))))
+                    (hash-set! xml_hash waiting_value_key (from-entity-chars (list->string (reverse (cdr chars)))))))))
 
             (set! waiting_pure_key #f)
             (set! waiting_value_key #f)
@@ -126,7 +127,7 @@
               (hash-set! xml_hash waiting_value_key
                          (if (null? chars)
                              ""
-                             (from-special-chars (list->string (reverse (cdr chars)))))))
+                             (from-entity-chars (list->string (reverse (cdr chars)))))))
 
             (set! waiting_pure_key #f)
             (set! waiting_value_key #f)
@@ -180,7 +181,7 @@
                      (lambda (property_port)
                        (let loop-properties ([properties (filter (cons/c (or/c string? symbol?) (or/c string? symbol?)) (cdr nodes))])
                          (when (not (null? properties))
-                           (fprintf property_port" ~a=\"~a\"" (caar properties) (to-special-chars (cdar properties)))
+                           (fprintf property_port" ~a=\"~a\"" (caar properties) (to-entity-chars (cdar properties)))
                            (loop-properties (cdr properties)))))))
 
            (if (null? children)
@@ -188,7 +189,7 @@
                (begin
                  (fprintf out_p ">")
                  (if (not (null? value_children))
-                     (fprintf out_p "~a</~a>\n" (to-special-chars (apply string-append (map (lambda (v) (format "~a" v)) value_children))) (car nodes))
+                     (fprintf out_p "~a</~a>\n" (to-entity-chars (apply string-append (map (lambda (v) (format "~a" v)) value_children))) (car nodes))
                      (fprintf out_p "\n~a~a</~a>\n"
                               (call-with-output-string
                                (lambda (children_port)
@@ -198,5 +199,3 @@
                                      (loop-children (cdr children))))))
                               prefix_spaces
                               (car nodes)))))))))))
-
-

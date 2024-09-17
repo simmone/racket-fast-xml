@@ -150,39 +150,38 @@
                (if (> (string-length key) 0)
                    (cons (cons key (add1 (hash-ref xml_hash key_count 0))) keys)
                    keys))
-               keys)
+             keys)
          (if reserve_char? (cons ch chars) '())
          waiting_pure_key
          waiting_value_key)))
     xml_hash))
 
 (let ([stderr_port (current-error-port)])
-  (with-output-to-file
-      show_file
+  (with-output-to-file show_file
     #:exists 'replace
     (lambda ()
       (printf "| Status | Char | Keys | Chars | Waiting Pure Key| Waiting Value Key |\n")
       (printf "|--------|------|------|-------|-----------------|-------------------|\n")
 
-    (let ([xml_hash
-           (xml-file-to-hash
-            data_xml_file
-            '(
-              "Properties.TitlesOfParts.vt:vector.vt:lpstr"
-              )
-            stderr_port
-            (current-output-port)
-            )])
-      
-      (fprintf stderr_port "~a\n" xml_hash)
+      (let ([xml_hash
+             (xml-file-to-hash
+              data_xml_file
+              '(
+                "basic1.attr1"
+                "basic1.attr2"
+                "basic1.attr3"
+                "basic1.attr4"
+                "basic1.attr5"
+                )
+              stderr_port
+              (current-output-port)
+              )])
+        
+        (fprintf stderr_port "~a\n" xml_hash)
 
-      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector's count") 1)
-      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr's count") 6)
-
-      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr1") "数据页面")
-      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr2") "Sheet2")
-      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr3") "Sheet3")
-      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr4") "Chart1")
-      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr5") "Chart4")
-      (check-equal? (hash-ref xml_hash "Properties1.TitlesOfParts1.vt:vector1.vt:lpstr6") "Chart5")
-      ))))
+        (check-equal? (hash-ref xml_hash "basic11.attr11") "&")
+        (check-equal? (hash-ref xml_hash "basic11.attr21") "<")
+        (check-equal? (hash-ref xml_hash "basic11.attr31") ">")
+        (check-equal? (hash-ref xml_hash "basic11.attr41") "'")
+        (check-equal? (hash-ref xml_hash "basic11.attr51") "\"")
+        ))))

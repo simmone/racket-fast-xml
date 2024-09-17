@@ -19,11 +19,12 @@
             attr1_xml_file
             '(
               "worksheet.xmlns"
+              "worksheet.xmlns:x14ac"
               "worksheet.cols.test"
               "worksheet.cols.col.collapsed"
               ))])
 
-      (check-equal? (hash-count xml_hash) 7)
+      (check-equal? (hash-count xml_hash) 8)
 
       (check-equal? (hash-ref xml_hash "worksheet's count") 1)
 
@@ -32,6 +33,8 @@
       (check-equal? (hash-ref xml_hash "worksheet1.cols1.col's count") 3)
 
       (check-equal? (hash-ref xml_hash "worksheet1.xmlns1") "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
+
+      (check-equal? (hash-ref xml_hash "worksheet1.xmlns:x14ac1") "http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac")
 
       (check-equal? (hash-ref xml_hash "worksheet1.cols1.test1") "2")
 

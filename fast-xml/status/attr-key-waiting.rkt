@@ -10,6 +10,10 @@
   (cond
    [(char=? ch #\space)
     (values 'ATTR_KEY_WAITING #t #f #f)]
+   [(char=? ch #\newline)
+    (values 'ATTR_KEY_WAITING #t #f #f)]
+   [(char=? ch #\return)
+    (values 'ATTR_KEY_WAITING #t #f #f)]
    [(char=? ch #\>)
     (values 'KEY_END #t #f #f)]
    [(char=? ch #\?)

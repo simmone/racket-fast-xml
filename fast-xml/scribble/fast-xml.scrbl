@@ -132,6 +132,26 @@ list1.child1.attr1: [a1]
 list1.child1.attr2: []
 }
 
+@subsection{Entity Convert}
+
+There are two kinds of entity:
+
+1. numeric character reference
+
+    &#xhhhh; or  &#nnnn;
+
+   where the x must be lowercase in XML documents, hhhh is the code point in hexadecimal form, and nnnn is the code point in decimal form. 
+
+2. 5 predefined name
+ 
+  &name;
+
+  &amp;[&], &lt;[<], &gt;[>], &apos;['], and &quot;["].
+
+when reading from xml, attributes and values will be convert from entity to specific character.
+
+when writing to xml, in attributes and values, 5 special chars will be converted to entity string.
+
 @section{lists-to-xml}
 
 @codeblock{
